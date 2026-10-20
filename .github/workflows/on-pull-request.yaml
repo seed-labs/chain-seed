@@ -1,6 +1,9 @@
-name: Check Pull Request
+name: ChainSeed CI
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -20,6 +23,7 @@ on:
           - all
           - D01
           - D10
+          - D11
           - D20
           - D21
           - D22
@@ -94,12 +98,13 @@ jobs:
         run: python -m compileall -q chainseed examples
 
       - name: Check public imports
-        run: python -m pytest -q tests/test_public_imports.py tests/test_package_integration.py tests/test_example_network.py tests/test_runner_commands.py tests/test_ethereum_runtime_config.py tests/test_ethereum_static_peers.py tests/test_lookingglass_server.py
+        run: python -m pytest -q tests/test_public_imports.py tests/test_package_integration.py tests/test_example_network.py tests/test_runner_commands.py tests/test_ethereum_runtime_config.py tests/test_ethereum_static_peers.py tests/test_lookingglass_server.py tests/test_d11_lookingglass.py
 
       - name: Validate example manifests
         run: |
           chainseed-test clean examples/D01_ethereum_pos/example.yaml
           chainseed-test clean examples/D10_eth_explorer/example.yaml
+          chainseed-test clean examples/D11_lookingglass/example.yaml
           chainseed-test clean examples/D20_faucet/example.yaml
           chainseed-test clean examples/D21_deploy_contract/example.yaml
           chainseed-test clean examples/D22_oracle/example.yaml
@@ -122,6 +127,8 @@ jobs:
             manifest: examples/D01_ethereum_pos/example.yaml
           - code: D10
             manifest: examples/D10_eth_explorer/example.yaml
+          - code: D11
+            manifest: examples/D11_lookingglass/example.yaml
           - code: D20
             manifest: examples/D20_faucet/example.yaml
           - code: D21
@@ -189,6 +196,8 @@ jobs:
             manifest: examples/D01_ethereum_pos/example.yaml
           - code: D10
             manifest: examples/D10_eth_explorer/example.yaml
+          - code: D11
+            manifest: examples/D11_lookingglass/example.yaml
           - code: D20
             manifest: examples/D20_faucet/example.yaml
           - code: D21

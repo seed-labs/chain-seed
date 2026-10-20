@@ -201,7 +201,7 @@ class PeerProbe:
                 node["metrics"] = sample["metrics"]
             if sample.get("txpool"):
                 node["txpool"] = sample["txpool"]
-            for key in ("head", "head_at", "head_error"):
+            for key in ("head", "head_at", "head_error", "metrics_checked_at"):
                 if key in sample:
                     node[key] = sample[key]
             for peer in sample.get("ids", []):

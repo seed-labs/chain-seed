@@ -33,6 +33,9 @@ cross-AS enodes, dump reuse, legacy/PoS commands and invalid peer declarations.
 `test_example_network.py` checks mini/hybrid networks and `.bin` reuse.
 `test_lookingglass_server.py` checks the global inventory, defaults, native Docker
 port publication, runtime files, optional observations and D61 mount compatibility.
+`test_d11_lookingglass.py` checks D11 defaults and verifies that its runtime test
+rejects stale, missing and configured-only observations. Run the Docker checks
+manually with `chainseed-test all examples/D11_lookingglass/example.yaml`.
 `check_repository_boundaries.py --seedemu ../seed-emulator` checks source
 ownership, removed API references, and Python syntax across both repositories.
 SeedEmu retains its legacy blockchain sources; boundary checks enforce ChainSEED

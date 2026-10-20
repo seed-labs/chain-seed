@@ -45,7 +45,7 @@ def main():
             assert (root / "pos-output/docker-compose.yml").is_file()
             assert (root / "poa.bin").is_file()
             print("Copied Ethereum examples work with installed ChainSEED and SeedEmu development")
-            for example in ("D01_ethereum_pos", "D10_eth_explorer", "D20_faucet", "D21_deploy_contract", "D22_oracle", "D23_validator"):
+            for example in ("D01_ethereum_pos", "D10_eth_explorer", "D11_lookingglass", "D20_faucet", "D21_deploy_contract", "D22_oracle", "D23_validator"):
                 manifest = root / "examples" / example / "example.yaml"
                 result = subprocess.run(
                     [sys.executable, "-m", "chainseed.testing.cli", "compile", str(manifest), "--artifact-dir", str(root / "artifacts" / example)],

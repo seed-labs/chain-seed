@@ -9,6 +9,7 @@ Examples are arranged by D number. Each directory contains its own manual.
 | [D05](D05_ethereum_small/) | Small Ethereum network |
 | [D06](D06_ethereum_test/) | Ethereum test scripts |
 | [D10](D10_eth_explorer/) | Ethereum explorer |
+| [D11](D11_lookingglass/) | Global Ethereum Lookingglass |
 | [D20](D20_faucet/) | Faucet |
 | [D21](D21_deploy_contract/) | Contract deployment |
 | [D22](D22_oracle/) | Oracle |
