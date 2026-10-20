@@ -35,14 +35,16 @@ def check_seedemu_compatibility() -> None:
     from seedemu import core
     from seedemu.compiler import Docker
 
-    if (
-        not hasattr(core, "SystemProfile")
-        or not callable(getattr(Docker, "_getSystemImageCatalog", None))
-        or not callable(getattr(Docker, "addContainerBundle", None))
-    ):
+    required = {
+        "seedemu.core.SystemProfile": hasattr(core, "SystemProfile"),
+        "Docker._getSystemImageCatalog": callable(getattr(Docker, "_getSystemImageCatalog", None)),
+        "Docker.addContainerBundle": callable(getattr(Docker, "addContainerBundle", None)),
+    }
+    missing = [name for name, available in required.items() if not available]
+    if missing:
         raise RuntimeError(
-            "chainseed requires SeedEmu SystemProfile, image catalog hooks and ContainerBundle support; "
-            "install SeedEmu from the Docker branch. The distribution "
+            "chainseed is missing required SeedEmu capabilities: " + ", ".join(missing) + "; "
+            "install SeedEmu from the development branch. The distribution "
             "version alone does not identify these capabilities."
         )
 

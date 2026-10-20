@@ -13,7 +13,7 @@ on:
         description: "SeedEmu revision from seed-labs/seed-emulator"
         type: string
         required: true
-        default: Docker
+        default: development
       selected-example:
         description: "Run one selected example, or all"
         type: choice
@@ -39,7 +39,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SEEDEMU_REF: ${{ github.event.inputs['seedemu-ref'] || 'Docker' }}
+  SEEDEMU_REF: ${{ github.event.inputs['seedemu-ref'] || 'development' }}
   SELECTED_EXAMPLE: ${{ github.event.inputs['selected-example'] || 'all' }}
   RUN_FULL_LIFECYCLE: ${{ github.event.inputs['run-full-lifecycle'] || 'false' }}
 

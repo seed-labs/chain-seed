@@ -53,11 +53,11 @@ Python caches, and Node package caches are excluded from Git.
 The Python distribution and import name are both `chainseed`; the repository
 remains `chain-seed`. Python 3.10 is currently supported. The legacy Web3 5
 stack must be upgraded before Python 3.11 and newer can be supported.
-Use the SeedEmu `Docker` branch (currently packaged as `0.0.7`).
-ChainSEED checks for `SystemProfile` and the Docker extension hooks at import time;
+Use the SeedEmu `development` branch (currently packaged as `0.0.7`).
+ChainSEED checks for `SystemProfile`, image catalog hooks and `Docker.addContainerBundle` at import time;
 a version number alone cannot establish compatibility. ChainSEED has not been published to PyPI.
 
-Install SeedEmu from its `Docker` checkout in editable mode, then install ChainSEED normally:
+Install SeedEmu from its `development` checkout in editable mode, then install ChainSEED normally:
 
 ```bash
 python3.10 -m venv .venv
@@ -66,7 +66,7 @@ python -m pip install -e ../seed-emulator
 python -m pip install .
 ```
 
-Install SeedEmu from the `Docker` checkout first, then install ChainSEED.
+Install SeedEmu from the `development` checkout first, then install ChainSEED.
 ChainSEED declares SeedEmu as a dependency, but an older PyPI build with the same
 version may lack the required hooks. SeedEmu is maintained independently and
 still retains its legacy blockchain implementation.
@@ -95,7 +95,7 @@ clone ChainSeed inside the SeedEmu repository.
 mkdir seed-workspace
 cd seed-workspace
 
-git clone --branch Docker https://github.com/seed-labs/seed-emulator.git
+git clone --branch development https://github.com/seed-labs/seed-emulator.git
 git clone https://github.com/seed-labs/chain-seed.git
 
 python3 -m venv .venv
@@ -173,7 +173,8 @@ docs/            Architecture, integration and user manuals
 The target architecture and remaining SeedEmu API work are documented in
 [docs/design](docs/design/README.md).
 
-SeedEmu’s Docker branch configures emulated Local/InternetExchange networks,
+SeedEmu’s Docker branch contains the network fix that must also be merged into
+`development` for the network forwarding check to pass. It configures emulated Local/InternetExchange networks,
 requiring Docker Engine 28 or newer. These networks use `gateway_mode_ipv4=nat-unprotected` to allow direct-routed access required by
 the emulated routers. This allows direct routed access to
 unpublished ports on those networks; external Bridge networks keep their

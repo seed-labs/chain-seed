@@ -4,7 +4,7 @@
 
 ## Implementation status
 
-ChainSEED currently targets the SeedEmu `Docker` branch, packaged
+ChainSEED currently targets the SeedEmu `development` branch, packaged
 as `0.0.7`. It checks `SystemProfile` and Docker extension hooks directly;
 SeedEmu does not expose `EXTENSION_API_VERSION`. The upstream legacy blockchain
 implementations remain in place. Network definitions are shared from E00

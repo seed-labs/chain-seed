@@ -49,7 +49,7 @@ Monero 自定义镜像选择。
 
 Python 发行名是 `chainseed`，导入名同样是 `chainseed`；仓库名仍为 `chain-seed`。
 当前支持 Python 3.10，旧版 Web3 5 依赖升级前不支持 Python 3.11 及以上。
-使用 SeedEmu `Docker` 分支（当前发行版本为 `0.0.7`）。ChainSEED 在导入时
+使用 SeedEmu `development` 分支（当前发行版本为 `0.0.7`）。ChainSEED 在导入时
 检查 `SystemProfile` 和 Docker 扩展钩子，版本号本身不足以证明兼容性。
 ChainSEED 尚未发布到 PyPI。
 
@@ -62,7 +62,7 @@ python -m pip install -e ../seed-emulator
 python -m pip install .
 ```
 
-先从 SeedEmu `Docker` 源码安装，再安装 ChainSEED。虽然 ChainSEED 声明
+先从 SeedEmu `development` 源码安装，再安装 ChainSEED。虽然 ChainSEED 声明
 了 SeedEmu 依赖，但 PyPI 上同版本的旧构建可能没有所需钩子。
 SeedEmu 独立维护，目前仍保留其旧区块链实现。
 SeedEmu Docker 的普通 wheel 缺少旧区块链模板资源，导入时会失败，
@@ -88,7 +88,7 @@ seed-workspace/
 mkdir seed-workspace
 cd seed-workspace
 
-git clone --branch Docker https://github.com/seed-labs/seed-emulator.git
+git clone --branch development https://github.com/seed-labs/seed-emulator.git
 git clone https://github.com/seed-labs/chain-seed.git
 
 python3 -m venv .venv
@@ -162,7 +162,7 @@ docs/            架构、集成与使用手册
 目标架构和仍需补充的 SeedEmu 公共 API 见
 [docs/design](docs/design/README.zh-CN.md)。
 
-网络模式由 SeedEmu 的 Docker 分支配置，ChainSeedDocker 直接继承，
+网络适配修复目前位于 SeedEmu 的 Docker 分支，还需合入 development 才能通过网络转发检查。ChainSeedDocker 直接继承上游网络编译，
 需要 Docker Engine 28 或更新版本。仿真的 Local/InternetExchange 网络使用 `gateway_mode_ipv4=nat-unprotected`，允许仿真路由器转发流量。
 该模式允许直接路由访问网络中未发布的端口，适用于独立实验环境；外部 Bridge
 网络保持上游默认配置。不修改 Docker daemon 的全局防火墙设置。
