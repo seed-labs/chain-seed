@@ -173,9 +173,5 @@ docs/            Architecture, integration and user manuals
 The target architecture and remaining SeedEmu API work are documented in
 [docs/design](docs/design/README.md).
 
-SeedEmu’s Docker branch contains the network fix that must also be merged into
-`development` for the network forwarding check to pass. It configures emulated Local/InternetExchange networks,
-requiring Docker Engine 28 or newer. These networks use `gateway_mode_ipv4=nat-unprotected` to allow direct-routed access required by
-the emulated routers. This allows direct routed access to
-unpublished ports on those networks; external Bridge networks keep their
-upstream defaults. Run these emulation networks in a dedicated lab environment.
+Docker network configuration is inherited from SeedEmu `development`.
+ChainSEED does not override network compilation.

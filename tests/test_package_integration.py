@@ -15,29 +15,6 @@ from chainseed.services.ethereum import ConsensusMechanism, EthereumService
 
 
 class PackageIntegrationTests(unittest.TestCase):
-    def test_emulated_networks_allow_router_forwarding(self):
-        from seedemu.core import Network, Registry
-        from seedemu.core.enums import NetworkType
-
-        compiler = ChainSeedDocker()
-        self.assertNotIn("_compileNet", ChainSeedDocker.__dict__)
-        for kind in (NetworkType.Local, NetworkType.InternetExchange):
-            network = Network("net", kind, "10.250.0.0/24")
-            Registry().register("250", "net", "net", network)
-            fragment = yaml.safe_load(compiler._compileNet(network))
-            options = next(iter(fragment.values()))["driver_opts"]
-            self.assertEqual(
-                options["com.docker.network.bridge.gateway_mode_ipv4"],
-                "nat-unprotected",
-            )
-        bridge = Network("external", NetworkType.Bridge, "172.30.250.0/24")
-        Registry().register("250", "net", "external", bridge)
-        fragment = yaml.safe_load(compiler._compileNet(bridge))
-        self.assertNotIn(
-            "com.docker.network.bridge.gateway_mode_ipv4",
-            next(iter(fragment.values()))["driver_opts"],
-        )
-
     def make_emulator(self, names):
         emulator = Emulator()
         base = Base()

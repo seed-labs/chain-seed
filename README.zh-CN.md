@@ -162,7 +162,4 @@ docs/            架构、集成与使用手册
 目标架构和仍需补充的 SeedEmu 公共 API 见
 [docs/design](docs/design/README.zh-CN.md)。
 
-网络适配修复目前位于 SeedEmu 的 Docker 分支，还需合入 development 才能通过网络转发检查。ChainSeedDocker 直接继承上游网络编译，
-需要 Docker Engine 28 或更新版本。仿真的 Local/InternetExchange 网络使用 `gateway_mode_ipv4=nat-unprotected`，允许仿真路由器转发流量。
-该模式允许直接路由访问网络中未发布的端口，适用于独立实验环境；外部 Bridge
-网络保持上游默认配置。不修改 Docker daemon 的全局防火墙设置。
+Docker 网络配置沿用 SeedEmu `development` 的默认行为，ChainSeedDocker 不覆写网络编译。
