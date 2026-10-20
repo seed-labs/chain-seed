@@ -18,4 +18,5 @@ node_modules/
 **/*.pcapng
 mini-internet.bin
 component_*.bin
-
+.vscode
+.idea
