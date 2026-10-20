@@ -119,6 +119,8 @@ use public SeedEmu APIs, and support mini/full/hybrid layouts and network `.bin`
 SeedEmu checkout's top-level `examples` directory. Example scripts remain in this
 repository; keep the complete `examples/` directory when copying them.
 
+See [case studies](case_study/README.md) for routing attacks, topology discovery and peer configuration.
+
 Use explicit chain imports:
 
 ```python
@@ -163,6 +165,7 @@ chainseed/       Python service layers and protocol-aware testing
 docker_images/   Blockchain client and explorer image recipes
 tools/           Explorer, wallet, and blockchain support tools
 examples/        Examples grouped by chain: chainlink, ethereum, monero and solana
+case_study/      Routing attacks, topology discovery and peer configuration
 experiments/     Archived prototypes and examples
 tests/           Package, compiler and runner checks
 docs/            Architecture, integration and user manuals

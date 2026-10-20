@@ -1,5 +1,8 @@
 # Test Ownership
 
+Every script in this directory is called by
+[ChainSeed CI](../.github/workflows/on-pull-request.yaml).
+
 ChainSeed uses the same manifest-driven lifecycle as SeedEmu. Canonical tests
 live beside their examples as `example.yaml` and `test_runtime.py`; the
 `chainseed-test` command runs the compile, build, start, readiness, probe,
@@ -29,6 +32,9 @@ scripts, compiled Docker files and process arguments, plus genesis/VC key ranges
 
 `test_ethereum_static_peers.py` checks logical Geth peers, client identity files,
 cross-AS enodes, dump reuse, legacy/PoS commands and invalid peer declarations.
+
+`test_case_studies.py` checks attack evidence, failed queries, sampled head
+observations and case-study deployment capacity without starting Docker.
 
 `test_example_network.py` checks mini/hybrid networks and `.bin` reuse.
 `test_lookingglass_server.py` checks the global inventory, defaults, native Docker

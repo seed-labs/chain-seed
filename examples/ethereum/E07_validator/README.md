@@ -19,7 +19,6 @@ activated by the beacon chain.
 - [Run the Validator Setup Script](#run-the-validator-setup-script)
 - [What the Setup Script Does](#what-the-setup-script-does)
 - [Observe the Validator Status](#observe-the-validator-status)
-- [Test Script](#test-script)
 - [Restart the Validator Client](#restart-the-validator-client)
 - [Important Notes](#important-notes)
 
@@ -214,56 +213,6 @@ messages similar to:
 Requesting unsigned block
 Publishing signed block
 Successfully published block
-```
-
-
-## Test Script
-
-The test script is:
-
-```text
-test_vc_at_running.py
-```
-
-It is a runtime monitor. It does not create a validator and it does not
-send a deposit. You should run it only after the emulator is running and
-after `vc_start_at_running.sh` has been executed.
-
-Run it from this example directory:
-
-```bash
-python3 test_vc_at_running.py
-```
-
-By default, it checks the beacon API at `http://10.151.0.72:8000` and
-monitors validator rank `10`. This matches the default topology: E01
-creates 9 validators at genesis, so the validator added by this example
-is expected to become the 10th validator in the beacon registry.
-
-The script repeatedly queries:
-
-```text
-/eth/v1/beacon/headers/head
-/eth/v1/beacon/states/head/validators
-```
-
-It waits until the watched validator has been seen in a pending state
-and later in an active state. Success looks like this:
-
-```text
-OK: validator_index=9 transitioned pending -> active
-```
-
-If the validator does not become active before the timeout, the script
-exits with code `2`. You can tune the monitor if your topology is
-different:
-
-```bash
-python3 test_vc_at_running.py \
-  --beacon-api http://10.151.0.72:8000 \
-  --rank 10 \
-  --timeout-secs 7200 \
-  --interval-secs 12
 ```
 
 

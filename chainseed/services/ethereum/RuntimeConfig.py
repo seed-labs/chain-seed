@@ -113,6 +113,7 @@ class BeaconRuntimeConfig:
     def _initBeaconRuntimeConfig(self):
         self._processor_max_workers = None
         self._reconstruct_historic_states = True
+        self._subscribe_all_subnets = False
         self._metrics_enabled = False
         self._metrics_port = 5054
         self._metrics_address = "0.0.0.0"
@@ -156,12 +157,22 @@ class BeaconRuntimeConfig:
         """Return this Beacon's metrics port, or None when metrics are disabled."""
         return self._metrics_port if self._metrics_enabled else None
 
+    def setSubscribeAllSubnets(self, enabled: bool = True):
+        """Subscribe this Beacon to all attestation subnets."""
+        self._assertConfigurable()
+        if type(enabled) is not bool:
+            raise ValueError("subscribe all subnets must be a bool")
+        self._subscribe_all_subnets = enabled
+        return self
+
     def _beaconRuntimeArguments(self):
         arguments = []
         if self._reconstruct_historic_states:
             arguments.append("--reconstruct-historic-states")
         if self._processor_max_workers is not None:
             arguments += ["--beacon-processor-max-workers", str(self._processor_max_workers)]
+        if self._subscribe_all_subnets:
+            arguments.append("--subscribe-all-subnets")
         if self._metrics_enabled:
             arguments += ["--metrics", "--metrics-address", self._metrics_address,
                           "--metrics-port", str(self._metrics_port)]

@@ -14,7 +14,7 @@ OLD_PROFILE = re.compile(r"BaseSystem\.SEEDEMU_(?:ETHEREUM\w*|MONERO|SOLANA|CHAI
 def check(seedemu: Path, chainseed: Path):
     errors = []
     count = 0
-    for repository, roots in ((seedemu, ("seedemu",)), (chainseed, ("chainseed", "examples", "experiments", "tests", "tools", "library"))):
+    for repository, roots in ((seedemu, ("seedemu",)), (chainseed, ("chainseed", "examples", "case_study", "experiments", "tests", "tools", "library"))):
         for root in roots:
             for path in (repository / root).rglob("*.py"):
                 if path.resolve() == Path(__file__).resolve():

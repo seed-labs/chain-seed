@@ -2,10 +2,6 @@
 #
 # Prepare the S00_solana emulation and leave all containers running.
 #
-# This script is intentionally separate from test_solana.sh:
-#   - prepare_solana.sh builds/generates/starts the environment
-#   - test_solana.sh only verifies an already-running environment
-#
 # Usage:
 #   ./prepare_solana.sh
 #   PLATFORM=linux/amd64 ./prepare_solana.sh
@@ -248,7 +244,6 @@ log "building containers and starting the cluster ..."
   || { fail "docker compose up failed"; exit 1; }
 
 ok "cluster containers are running."
-echo "Verify with: ./test_solana.sh"
 echo "Inspect bootstrap RPC with:"
 echo "  BOOT=\$(docker ps --format '{{.Names}}' | grep '^as150h-Solana-Bootstrap-150-' | head -n 1)"
 echo "  docker exec \"\$BOOT\" solana --url http://127.0.0.1:8899 cluster-version"

@@ -108,6 +108,8 @@ chainseed-test all chain-seed/examples/ethereum/E01_ethereum_pos/example.yaml
 ChainSeed 示例不再依赖 SeedEmu 源码中的顶层 `examples` 目录。
 示例脚本仍位于本仓库 `examples/`，使用时保留整个目录。
 
+路由攻击、拓扑发现和邻居配置示例见 [研究案例](case_study/README.md)。
+
 使用显式导入：
 
 ```python
@@ -150,6 +152,7 @@ chainseed/       Python 服务层和协议感知测试
 docker_images/   区块链客户端与 Explorer 镜像配方
 tools/           Explorer、钱包和区块链工具
 examples/        按链种分类的示例：chainlink、ethereum、monero、solana
+case_study/      路由攻击、拓扑发现与邻居配置示例
 experiments/     历史原型和示例
 tests/           软件包、编译器与运行器检查
 docs/            架构、集成与使用手册

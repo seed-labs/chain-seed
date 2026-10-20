@@ -59,10 +59,10 @@ def test_distinct_clients_reach_compiled_scripts_and_processes(network, tmp_path
     servers['g0'].enableGethHttp().setCacheMiB(128).setGoMemoryLimitMiB(384).setRpcTxFeeCap(0)
     servers['g1'].setCacheMiB(256).setGoMemoryLimitMiB(512).setRpcTxFeeCap('0.5')
     servers['g2'].setCustomGethCommandOption('--maxpeers 12')
-    servers['b0'].setProcessorMaxWorkers(2).setReconstructHistoricStates(False).enableMetrics(port=5055)
+    servers['b0'].setProcessorMaxWorkers(2).setReconstructHistoricStates(False).enableMetrics(port=5055).setSubscribeAllSubnets()
     servers['b0'].setBootstrapRetryPolicy(attempts=720, interval_seconds=1,
         connect_timeout_seconds=5, request_timeout_seconds=120)
-    servers['b1'].setProcessorMaxWorkers(8).enableMetrics().enableMetrics(False)
+    servers['b1'].setProcessorMaxWorkers(8).enableMetrics().enableMetrics(False).setSubscribeAllSubnets().setSubscribeAllSubnets(False)
     servers['v0'].setValidatorKeyCount(2)
     servers['v1'].setValidatorKeyCount(3)
     servers['setup'].setGenesisDelay(1800).setValidatorMnemonic(MNEMONIC)
@@ -101,6 +101,8 @@ def test_distinct_clients_reach_compiled_scripts_and_processes(network, tmp_path
     assert '--beacon-processor-max-workers 2' in b0
     assert '--reconstruct-historic-states' not in b0
     assert '--metrics-port 5055' in b0
+    assert '--subscribe-all-subnets' in b0
+    assert '--subscribe-all-subnets' not in b1
     assert '--beacon-processor-max-workers 8' in b1
     assert '--reconstruct-historic-states' in b1
     assert '--metrics' not in b1
@@ -169,6 +171,7 @@ def test_configuration_freezes_after_render(network):
                lambda: servers['g0'].setRpcTxFeeCap(0),
                lambda: servers['b0'].setProcessorMaxWorkers(4),
                lambda: servers['b0'].enableMetrics(),
+               lambda: servers['b0'].setSubscribeAllSubnets(),
                lambda: servers['b0'].connectToGethNode('g1'),
                lambda: servers['v0'].setValidatorKeyCount(10),
                lambda: servers['setup'].setValidatorMnemonic(MNEMONIC),
@@ -188,6 +191,7 @@ def test_invalid_values_are_rejected(network):
                lambda: servers['b0'].setProcessorMaxWorkers(0),
                lambda: servers['b0'].setReconstructHistoricStates('false'),
                lambda: servers['b0'].enableMetrics(port=65536),
+               lambda: servers['b0'].setSubscribeAllSubnets('false'),
                lambda: servers['b0'].enableMetrics(address='bad host'),
                lambda: servers['v0'].setValidatorKeyCount(1.5),
                lambda: servers['setup'].setGenesisDelay(-1),

@@ -98,24 +98,3 @@ The `alloc` section in the genesis block configuration includes account addresse
     }
 }
 ```
-
-## Test the contract deployment
-To test if the contract has been deployed successfully use the script provided:
-
-  ```bash
-  python3 test_deployment.py
-  ```
-
-### Expected output:
-  ```bash
-  Connected to Ethereum node successfully
-  Contract is deployed successfully
-  Total supply: 200000000000000000000000
-  Checking the initial balance of the accounts...
-  Balance of account 0xA08Ae0519125194cB516d72402a00A76d0126Af8: 1000000
-  Balance of account 0x2e2e3a61daC1A2056d9304F79C168cD16aAa88e9: 50000
-  Transferring 100 tokens from account 2 to account 1...
-  Balance after transaction:
-  Balance of account 0xA08Ae0519125194cB516d72402a00A76d0126Af8: 1000100
-  Balance of account 0x2e2e3a61daC1A2056d9304F79C168cD16aAa88e9: 49900
-```

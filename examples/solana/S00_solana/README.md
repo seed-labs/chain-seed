@@ -210,18 +210,6 @@ What happened during deployment:
   that program id; the Solana CLI manages deployment but does not provide a
   generic `program invoke` subcommand.
 
-## Automated test
-
-`test_solana.sh` verifies an already-running cluster. It does **not** build
-images, generate the emulation, start containers, recreate containers, or tear
-anything down. Run `./prepare_solana.sh` first, then run:
-
-```bash
-./test_solana.sh                   # verify the running cluster
-MIN_VALIDATORS=1 ./test_solana.sh  # accept a single voting validator
-MIN_VALIDATORS=10 ./test_solana.sh # require all ten validators to be voting
-```
-
 ## Logs and troubleshooting
 
 ```bash

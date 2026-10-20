@@ -36,6 +36,7 @@ complete network, client, binding and compilation steps.
 | Beacon | `setProcessorMaxWorkers(value)` | Lighthouse's default worker count |
 | Beacon | `setReconstructHistoricStates(enabled)` | Enabled, preserving existing examples |
 | Beacon | `enableMetrics(enabled=True, port=5054, address="0.0.0.0")` | Disabled |
+| Beacon | `setSubscribeAllSubnets(enabled=True)` | Disabled |
 | VC | `setValidatorKeyCount(count)` | One genesis validator key |
 | BeaconSetup | `setGenesisDelay(seconds)` | Zero seconds after setup startup |
 | BeaconSetup | `setValidatorMnemonic(mnemonic)` | Existing example mnemonic |
