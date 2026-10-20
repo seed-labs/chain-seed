@@ -143,7 +143,7 @@ def test_native_docker_compiles_host_publication_runtime_and_readonly_mount(tmp_
     subprocess.run(['bash', '-n', str(copies['/start.sh'])], check=True, capture_output=True)
     subprocess.run(['docker', 'compose', '-p', 'lookingglass-test', '-f', str(output / 'docker-compose.yml'),
                     'config', '--quiet'], check=True, capture_output=True)
-    # D61 preserves this node's build while converting client services to mounts.
+    # E12 preserves this node's build while converting client services to mounts.
     from tools.blockchain.lib.runtime_mounts import patch_output
     patch_output(output, output / 'docker-compose.yml', '/seedemu-node', 524288, False, False)
     assert (context / 'Dockerfile').read_text().startswith('FROM handsonsecurity/')

@@ -352,7 +352,7 @@ def patch_output(
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Patch generated D61 output to avoid per-node Docker builds."
+        description="Patch generated large-scale output to avoid per-node Docker builds."
     )
     parser.add_argument("--output", default="./output", help="Generated SEED output directory.")
     parser.add_argument(

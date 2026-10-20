@@ -97,16 +97,19 @@ chain-seed/
 │   ├── monero/large_scale/
 │   └── solana/large_scale/
 ├── examples/
-│   ├── D00_ethereum_poa/
-│   ├── D01_ethereum_pos/
-│   ├── ...
-│   ├── D60_monero/
-│   ├── D61_large_scale/
-│   │   ├── ethereum/
-│   │   ├── monero/
-│   │   └── solana/
-│   ├── D70_solana/
-│   └── ...
+│   ├── chainlink/
+│   │   └── C00_chainlink/
+│   ├── ethereum/
+│   │   ├── E00_ethereum_poa/
+│   │   ├── ...
+│   │   ├── E12_large_scale/
+│   │   └── ...
+│   ├── monero/
+│   │   ├── M00_monero/
+│   │   └── M01_large_scale/
+│   └── solana/
+│       ├── S00_solana/
+│       └── S01_large_scale/
 ├── experiments/legacy/
 ├── tests/
 └── docs/
@@ -371,7 +374,8 @@ dataset_id, schema_version, source_uri, sha256, bytes,
 created_at, generator_commit, seedemu_version, chainseed_version
 ```
 
-大规模部署示例位于 `examples/D61_large_scale/<protocol>/`，观测与负载工具
+大规模部署示例分别位于 `examples/ethereum/E12_large_scale/`、
+`examples/monero/M01_large_scale/` 和 `examples/solana/S01_large_scale/`，观测与负载工具
 位于 `tools/<protocol>/`。生成的部署和采样数据不提交到 Git。
 
 ## 版本策略

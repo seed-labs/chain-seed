@@ -39,7 +39,7 @@ def main():
     images = sorted({s['image'] for s in yaml.safe_load(compose.read_text())['services'].values()})
     common = Path(__file__).resolve().parents[2]/'blockchain/lib'
     sources = list(Path(__file__).parent.rglob('*.py')) + list(common.glob('*.py'))
-    example = Path(__file__).resolve().parents[3]/'examples/D61_large_scale/solana'
+    example = Path(__file__).resolve().parents[3]/'examples/solana/S01_large_scale'
     sources.extend(p for p in example.iterdir() if p.suffix in ('.py', '.sh'))
     config = dict(status='running', started_at=time.time(), interval=args.interval,
         duration=args.duration, nodes=len(nodes),

@@ -8,8 +8,8 @@ functional-test, and cleanup stages locally and in GitHub Actions.
 For example:
 
 ```bash
-chainseed-test compile examples/D01_ethereum_pos/example.yaml
-chainseed-test all examples/D01_ethereum_pos/example.yaml
+chainseed-test compile examples/ethereum/E01_ethereum_pos/example.yaml
+chainseed-test all examples/ethereum/E01_ethereum_pos/example.yaml
 ```
 
 `test_public_imports.py` is a lightweight package/API check. Runtime coverage
@@ -32,10 +32,10 @@ cross-AS enodes, dump reuse, legacy/PoS commands and invalid peer declarations.
 
 `test_example_network.py` checks mini/hybrid networks and `.bin` reuse.
 `test_lookingglass_server.py` checks the global inventory, defaults, native Docker
-port publication, runtime files, optional observations and D61 mount compatibility.
-`test_d11_lookingglass.py` checks D11 defaults and verifies that its runtime test
+port publication, runtime files, optional observations and E12 mount compatibility.
+`test_e05_lookingglass.py` checks E05 defaults and verifies that its runtime test
 rejects stale, missing and configured-only observations. Run the Docker checks
-manually with `chainseed-test all examples/D11_lookingglass/example.yaml`.
+manually with `chainseed-test all examples/ethereum/E05_lookingglass/example.yaml`.
 `check_repository_boundaries.py --seedemu ../seed-emulator` checks source
 ownership, removed API references, and Python syntax across both repositories.
 SeedEmu retains its legacy blockchain sources; boundary checks enforce ChainSEED

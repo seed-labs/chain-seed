@@ -75,7 +75,7 @@ Its ordinary wheel currently omits legacy blockchain templates and fails during
 import. Keep the SeedEmu checkout for the editable installation above until
 upstream packaging is fixed.
 Docker, client images, and Node tooling are separate runtime prerequisites.
-D01 PoS block production and signed ETH transfer validation passed on Docker 29.9.0; other examples still need runtime validation.
+E01 PoS block production and signed ETH transfer validation passed on Docker 29.9.0; other examples still need runtime validation.
 
 ## Install for coordinated development
 
@@ -110,11 +110,11 @@ Run a local compile-only check or the complete Docker lifecycle with the same
 entry point used by CI:
 
 ```bash
-chainseed-test compile chain-seed/examples/D01_ethereum_pos/example.yaml
-chainseed-test all chain-seed/examples/D01_ethereum_pos/example.yaml
+chainseed-test compile chain-seed/examples/ethereum/E01_ethereum_pos/example.yaml
+chainseed-test all chain-seed/examples/ethereum/E01_ethereum_pos/example.yaml
 ```
 
-Shared network definitions live in `examples/D00_ethereum_poa/mini_internet.py`,
+Shared network definitions live in `examples/ethereum/E00_ethereum_poa/mini_internet.py`,
 use public SeedEmu APIs, and support mini/full/hybrid layouts and network `.bin` export. ChainSeed examples no longer depend on the
 SeedEmu checkout's top-level `examples` directory. Example scripts remain in this
 repository; keep the complete `examples/` directory when copying them.
@@ -162,7 +162,7 @@ semantic-versioned. A tested compatibility matrix belongs in each release.
 chainseed/       Python service layers and protocol-aware testing
 images/          Blockchain client and explorer image recipes
 tools/           Explorer, wallet, and blockchain support tools
-examples/        Examples ordered by D number; large-scale deployments under D61
+examples/        Examples grouped by chain: chainlink, ethereum, monero and solana
 experiments/     Archived prototypes and examples
 tests/           Package, compiler and runner checks
 docs/            Architecture, integration and user manuals

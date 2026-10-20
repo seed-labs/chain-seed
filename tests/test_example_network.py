@@ -6,7 +6,7 @@ import tempfile
 import unittest
 
 from seedemu.core import Emulator
-from examples.D00_ethereum_poa import mini_internet, ethereum_poa
+from examples.ethereum.E00_ethereum_poa import mini_internet, ethereum_poa
 
 
 class ExampleNetworkTests(unittest.TestCase):

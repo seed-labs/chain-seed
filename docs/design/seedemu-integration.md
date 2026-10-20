@@ -7,7 +7,7 @@
 ChainSEED currently targets the SeedEmu `Docker` branch, packaged
 as `0.0.7`. It checks `SystemProfile` and Docker extension hooks directly;
 SeedEmu does not expose `EXTENSION_API_VERSION`. The upstream legacy blockchain
-implementations remain in place. Network definitions are shared from D00
+implementations remain in place. Network definitions are shared from E00
 `mini_internet.py`, including unrendered network dumps.
 
 Currently implemented in the coordinated working trees:

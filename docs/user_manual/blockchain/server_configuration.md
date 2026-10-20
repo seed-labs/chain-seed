@@ -25,7 +25,7 @@ setup = chain.createBeaconSetupNode("beaconsetup").setGenesisDelay(1800)
 ```
 
 Bind the virtual nodes to network hosts and add the Ethereum service as usual.
-The [D61 example](../../../examples/D61_large_scale/ethereum/README.md) shows the
+The [E12 example](../../../examples/ethereum/E12_large_scale/README.md) shows the
 complete network, client, binding and compilation steps.
 
 | Server | API | Default when not configured |
@@ -97,7 +97,7 @@ The selected Geth must call `enableGethHttp()` and the selected Beacon must reta
 `setReconstructHistoricStates(True)`. Both must belong to the requested chain.
 Without selectors the component chooses eligible nodes automatically. The
 configured Geth HTTP RPC port is forwarded to both Explorer services.
-See the [D10 manual](../../../examples/D10_eth_explorer/README.md).
+See the [E04 manual](../../../examples/ethereum/E04_eth_explorer/README.md).
 
 
 ## Geth static peers

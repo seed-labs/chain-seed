@@ -31,7 +31,7 @@ class Endpoint:
         if plain:
             url = url.rsplit('/', 1)[0] + '/' + method
         else:
-            body = dict(jsonrpc='2.0', id='d61', method=method, params=body)
+            body = dict(jsonrpc='2.0', id='m01', method=method, params=body)
         response = self.session.post(url, json=body, timeout=(5, 60))
         response.raise_for_status()
         data = response.json()

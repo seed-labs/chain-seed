@@ -11,5 +11,5 @@ send transactions and collect receipts.
 
 Use [Lookingglass](../lookingglass/README.md) to view deployment and observation data.
 
-See the [D61 manual](../../../examples/D61_large_scale/ethereum/README.md) for the commands in order.
+See the [E12 manual](../../../examples/ethereum/E12_large_scale/README.md) for the commands in order.
 Use each script's `--help` option for its arguments.

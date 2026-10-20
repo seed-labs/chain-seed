@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Collect block-production and transaction-count samples for D61 experiments."""
+"""Collect block-production and transaction-count samples for E12 experiments."""
 
 from __future__ import annotations
 

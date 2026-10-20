@@ -67,7 +67,7 @@ SeedEmu 独立维护，目前仍保留其旧区块链实现。
 SeedEmu Docker 的普通 wheel 缺少旧区块链模板资源，导入时会失败，
 因此当前使用上述 editable 安装，保留源码目录。此问题需要由上游另行修复。
 Docker、客户端镜像和 Node 工具链不由 Python 包安装提供。
-通用 Docker 网络适配已移至 SeedEmu 的 Docker 分支，ChainSEED 不再覆写网络编译。D01 的 PoS 出块和签名 ETH 转账
+通用 Docker 网络适配已移至 SeedEmu 的 Docker 分支，ChainSEED 不再覆写网络编译。E01 的 PoS 出块和签名 ETH 转账
 已在 Docker 29.9.0 上验证通过；其他示例仍需动态验证。
 
 ## 联合开发安装
@@ -100,11 +100,11 @@ python -m pip install -e "./chain-seed[dev]"
 本地编译检查和完整 Docker 生命周期使用与 CI 相同的入口：
 
 ```bash
-chainseed-test compile chain-seed/examples/D01_ethereum_pos/example.yaml
-chainseed-test all chain-seed/examples/D01_ethereum_pos/example.yaml
+chainseed-test compile chain-seed/examples/ethereum/E01_ethereum_pos/example.yaml
+chainseed-test all chain-seed/examples/ethereum/E01_ethereum_pos/example.yaml
 ```
 
-共享网络定义位于 `examples/D00_ethereum_poa/mini_internet.py`，调用 SeedEmu 公开网络 API，支持 mini/full/hybrid 拓扑和网络 `.bin` 导出。
+共享网络定义位于 `examples/ethereum/E00_ethereum_poa/mini_internet.py`，调用 SeedEmu 公开网络 API，支持 mini/full/hybrid 拓扑和网络 `.bin` 导出。
 ChainSeed 示例不再依赖 SeedEmu 源码中的顶层 `examples` 目录。
 示例脚本仍位于本仓库 `examples/`，使用时保留整个目录。
 
@@ -149,7 +149,7 @@ ChainSeed 当前没有单独的 upstream，可以直接从当前远端发布。�
 chainseed/       Python 服务层和协议感知测试
 images/          区块链客户端与 Explorer 镜像配方
 tools/           Explorer、钱包和区块链工具
-examples/        按 D 编号排列的示例，D61 包含三种链的大规模部署
+examples/        按链种分类的示例：chainlink、ethereum、monero、solana
 experiments/     历史原型和示例
 tests/           软件包、编译器与运行器检查
 docs/            架构、集成与使用手册

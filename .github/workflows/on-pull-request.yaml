@@ -21,13 +21,13 @@ on:
         default: all
         options:
           - all
-          - D01
-          - D10
-          - D11
-          - D20
-          - D21
-          - D22
-          - D23
+          - E01
+          - E04
+          - E05
+          - E06
+          - E07
+          - E08
+          - E09
       run-full-lifecycle:
         description: "Run Docker build/up/probe/test/down lifecycle"
         type: boolean
@@ -98,17 +98,17 @@ jobs:
         run: python -m compileall -q chainseed examples
 
       - name: Check public imports
-        run: python -m pytest -q tests/test_public_imports.py tests/test_package_integration.py tests/test_example_network.py tests/test_runner_commands.py tests/test_ethereum_runtime_config.py tests/test_ethereum_static_peers.py tests/test_lookingglass_server.py tests/test_d11_lookingglass.py
+        run: python -m pytest -q tests/test_public_imports.py tests/test_package_integration.py tests/test_example_network.py tests/test_runner_commands.py tests/test_ethereum_runtime_config.py tests/test_ethereum_static_peers.py tests/test_lookingglass_server.py tests/test_e05_lookingglass.py
 
       - name: Validate example manifests
         run: |
-          chainseed-test clean examples/D01_ethereum_pos/example.yaml
-          chainseed-test clean examples/D10_eth_explorer/example.yaml
-          chainseed-test clean examples/D11_lookingglass/example.yaml
-          chainseed-test clean examples/D20_faucet/example.yaml
-          chainseed-test clean examples/D21_deploy_contract/example.yaml
-          chainseed-test clean examples/D22_oracle/example.yaml
-          chainseed-test clean examples/D23_validator/example.yaml
+          chainseed-test clean examples/ethereum/E01_ethereum_pos/example.yaml
+          chainseed-test clean examples/ethereum/E04_eth_explorer/example.yaml
+          chainseed-test clean examples/ethereum/E05_lookingglass/example.yaml
+          chainseed-test clean examples/ethereum/E06_faucet/example.yaml
+          chainseed-test clean examples/ethereum/E07_deploy_contract/example.yaml
+          chainseed-test clean examples/ethereum/E08_oracle/example.yaml
+          chainseed-test clean examples/ethereum/E09_validator/example.yaml
 
   compile-selected-examples:
     name: Compile ${{ matrix.example.code }}
@@ -123,20 +123,20 @@ jobs:
       fail-fast: false
       matrix:
         example:
-          - code: D01
-            manifest: examples/D01_ethereum_pos/example.yaml
-          - code: D10
-            manifest: examples/D10_eth_explorer/example.yaml
-          - code: D11
-            manifest: examples/D11_lookingglass/example.yaml
-          - code: D20
-            manifest: examples/D20_faucet/example.yaml
-          - code: D21
-            manifest: examples/D21_deploy_contract/example.yaml
-          - code: D22
-            manifest: examples/D22_oracle/example.yaml
-          - code: D23
-            manifest: examples/D23_validator/example.yaml
+          - code: E01
+            manifest: examples/ethereum/E01_ethereum_pos/example.yaml
+          - code: E04
+            manifest: examples/ethereum/E04_eth_explorer/example.yaml
+          - code: E05
+            manifest: examples/ethereum/E05_lookingglass/example.yaml
+          - code: E06
+            manifest: examples/ethereum/E06_faucet/example.yaml
+          - code: E07
+            manifest: examples/ethereum/E07_deploy_contract/example.yaml
+          - code: E08
+            manifest: examples/ethereum/E08_oracle/example.yaml
+          - code: E09
+            manifest: examples/ethereum/E09_validator/example.yaml
     steps:
       - name: Check out ChainSeed
         uses: actions/checkout@v5
@@ -192,20 +192,20 @@ jobs:
       fail-fast: false
       matrix:
         example:
-          - code: D01
-            manifest: examples/D01_ethereum_pos/example.yaml
-          - code: D10
-            manifest: examples/D10_eth_explorer/example.yaml
-          - code: D11
-            manifest: examples/D11_lookingglass/example.yaml
-          - code: D20
-            manifest: examples/D20_faucet/example.yaml
-          - code: D21
-            manifest: examples/D21_deploy_contract/example.yaml
-          - code: D22
-            manifest: examples/D22_oracle/example.yaml
-          - code: D23
-            manifest: examples/D23_validator/example.yaml
+          - code: E01
+            manifest: examples/ethereum/E01_ethereum_pos/example.yaml
+          - code: E04
+            manifest: examples/ethereum/E04_eth_explorer/example.yaml
+          - code: E05
+            manifest: examples/ethereum/E05_lookingglass/example.yaml
+          - code: E06
+            manifest: examples/ethereum/E06_faucet/example.yaml
+          - code: E07
+            manifest: examples/ethereum/E07_deploy_contract/example.yaml
+          - code: E08
+            manifest: examples/ethereum/E08_oracle/example.yaml
+          - code: E09
+            manifest: examples/ethereum/E09_validator/example.yaml
     steps:
       - name: Check out ChainSeed
         uses: actions/checkout@v5

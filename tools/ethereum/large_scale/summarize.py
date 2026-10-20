@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Summarize one D61 trial without changing raw data or treating gaps as success."""
+"""Summarize one E12 trial without changing raw data or treating gaps as success."""
 import argparse
 from collections import defaultdict
 import csv

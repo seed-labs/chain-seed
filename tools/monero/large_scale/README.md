@@ -9,7 +9,7 @@
 | `measure.py` | Collect project-scoped container resources and chain health. |
 | `summarize.py` | Summarize the transfer window, including resources, chain progress, mining and inclusion. |
 
-See the [D61 manual](../../../examples/D61_large_scale/monero/README.md) for the
+See the [M01 manual](../../../examples/monero/M01_large_scale/README.md) for the
 commands in order. Each script has `--help`.
 
 Use one run directory per experiment and keep `miner-state.json` there. Funding

@@ -97,7 +97,7 @@ def test_lighthouse_probes_do_not_match_their_own_shell():
 
     examples = Path(__file__).resolve().parents[1] / "examples"
     checked = 0
-    for manifest in examples.glob("*/example.yaml"):
+    for manifest in examples.glob("*/*/example.yaml"):
         for probe in yaml.safe_load(manifest.read_text()).get("probes", []):
             command = probe.get("command", "")
             if "pgrep -af" not in command or "ighthouse" not in command:

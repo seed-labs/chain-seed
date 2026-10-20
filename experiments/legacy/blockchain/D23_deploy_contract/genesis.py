@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from seedemu import *
-from examples.D00_ethereum_poa import ethereum_poa
+from examples.ethereum.E00_ethereum_poa import ethereum_poa
 from chainseed.ethereum import *
 from lib.services.EthereumService.EthUtil import CustomGenesis
 from lib.services.EthereumService.EthereumService import CustomBlockchain

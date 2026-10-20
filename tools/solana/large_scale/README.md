@@ -8,7 +8,7 @@
 | `summarize.py` | Summarize resources, finalized progress, process counts and optional transfer evidence. |
 | `host_tuning.sh` | Explicitly show, apply or restore runtime host limits. |
 
-See the [D61 manual](../../../examples/D61_large_scale/solana/README.md) for the
+See the [S01 manual](../../../examples/solana/S01_large_scale/README.md) for the
 commands in order. Each Python script has `--help`.
 
 Only the final genesis-preseeded voting configuration is supported. All identities,
@@ -24,7 +24,7 @@ and requires more than two-thirds of stake to be current, together with advancin
 finalized slots. Process checks read only the configured containers' cgroups.
 
 Compilation settings live at the top of
-[`solana_large_scale.py`](../../../examples/D61_large_scale/solana/solana_large_scale.py).
+[`solana_large_scale.py`](../../../examples/solana/S01_large_scale/solana_large_scale.py).
 `_deployment.py` contains the retained low-memory Agave options. Genesis keeps the
 original raw `--target-tick-duration 500000` and `--ticks-per-slot 10` arguments;
 the old wrapper's misleading `_MS` variable name is not used. The original

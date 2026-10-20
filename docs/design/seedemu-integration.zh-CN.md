@@ -7,7 +7,7 @@
 ChainSEED 当前适配SeedEmu `Docker` 分支，发行版本为
 `0.0.7`。导入时直接检查 `SystemProfile` 和 Docker 扩展钩子；SeedEmu
 没有导出 `EXTENSION_API_VERSION`。上游仍保留旧区块链实现。共享网络定义
-位于 D00 的 `mini_internet.py`，支持未 render 的网络 bin 导出。
+位于 E00 的 `mini_internet.py`，支持未 render 的网络 bin 导出。
 
 当前两个配套工作区已经实现：
 

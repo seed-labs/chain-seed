@@ -1,6 +1,6 @@
 # Ethereum Lookingglass
 
-See [D11](../../../examples/D11_lookingglass/) for a complete deployment and runtime tests.
+See [E05](../../../examples/ethereum/E05_lookingglass/) for a complete deployment and runtime tests.
 
 Create one global viewer in the existing `EthereumService` and bind it to a host:
 

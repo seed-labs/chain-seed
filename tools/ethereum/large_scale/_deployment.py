@@ -1,4 +1,4 @@
-"""D61 deployment metadata and runtime mounts; client settings come from Servers."""
+"""E12 deployment metadata and runtime mounts; client settings come from Servers."""
 from pathlib import Path
 import json
 
