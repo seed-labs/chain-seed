@@ -12,7 +12,7 @@ contract address. In the future, we will add more APIs to share
 other type of information.
 
 To learn how to use this information server, please 
-see [this example](../../../examples/ethereum/E07_deploy_contract)
+see [this example](../../../examples/ethereum/E05_deploy_contract)
 
 
 

@@ -1,0 +1,81 @@
+id: blockchain-e03-lookingglass
+name: Ethereum PoS with Lookingglass
+description: The E01 network with a global Lookingglass Server, host port publication and live cross-AS observations.
+runner: blockchain
+script: ethereum_pos.py
+platform: amd
+features:
+  - ethereum-pos
+  - geth
+  - lighthouse
+  - validators-at-genesis
+  - lookingglass
+
+compile:
+  enabled: true
+  output: output
+  args:
+    - --override
+  clean:
+    - output
+  expected:
+    - output/docker-compose.yml
+  timeout: 1800
+
+build:
+  enabled: true
+  timeout: 3600
+
+runtime:
+  compose: output/docker-compose.yml
+  readiness:
+    - name: E03 Geth clients are running
+      type: ethereum-compose-ps
+      class_contains: Ethereum-POS-Geth
+      consensus: POS
+      expected_count: 3
+      retries: 60
+      interval: 3
+    - name: E03 Beacon clients are running
+      type: ethereum-compose-ps
+      class_contains: Ethereum-POS-Beacon
+      consensus: POS
+      expected_count: 3
+      retries: 60
+      interval: 3
+    - name: E03 genesis validator clients are running
+      type: ethereum-compose-ps
+      class_contains: Ethereum-POS-Validator
+      role: validator_at_genesis
+      consensus: POS
+      expected_count: 9
+      retries: 60
+      interval: 3
+    - name: E03 Lookingglass host is running
+      type: ethereum-compose-ps
+      class_contains: Ethereum-Lookingglass
+      expected_count: 1
+      retries: 60
+      interval: 3
+    - name: E03 Lookingglass snapshot is ready on the published host port
+      type: http
+      url: http://127.0.0.1:8765/api/status
+      expect_body_regex: '"snapshot_ready":\s*true'
+      retries: 60
+      interval: 5
+      timeout: 10
+
+probes:
+  - name: E03 Ethereum chain produces execution blocks
+    type: ethereum-block-progress
+    class_contains: Ethereum-POS-Geth
+    consensus: POS
+    min_delta: 1
+    block_retries: 90
+    block_interval: 5
+    timeout: 60
+
+test_programs:
+  - name: E03 Lookingglass global inventory and live observations
+    script: test_runtime.py
+    timeout: 900

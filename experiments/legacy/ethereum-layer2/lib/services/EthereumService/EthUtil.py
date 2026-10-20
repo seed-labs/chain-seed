@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from chainseed.ethereum.EthUtil import Genesis
+from chainseed.services.ethereum.EthUtil import Genesis
 
 
 class CustomGenesis(Genesis):

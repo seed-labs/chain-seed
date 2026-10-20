@@ -192,7 +192,7 @@ participate in block proposal and attestation after the PoS network
 starts.
 
 Adding validators after the chain has started is demonstrated in the
-[E09_validator](../E09_validator) example.
+[E07_validator](../E07_validator) example.
 
 
 ## Create Faucet and Utility Servers
@@ -332,10 +332,10 @@ Compose file.
 This example is the base PoS example. Other examples build on top of
 it:
 
-- [E04_eth_explorer](../E04_eth_explorer) focuses on the Eth Explorer.
-- [E06_faucet](../E06_faucet) demonstrates account funding through the
+- [E02_eth_explorer](../E02_eth_explorer) focuses on the Eth Explorer.
+- [E04_faucet](../E04_faucet) demonstrates account funding through the
   Faucet server.
-- [E07_deploy_contract](../E07_deploy_contract) demonstrates smart
+- [E05_deploy_contract](../E05_deploy_contract) demonstrates smart
   contract deployment through the Utility server.
-- [E09_validator](../E09_validator) demonstrates adding a validator
+- [E07_validator](../E07_validator) demonstrates adding a validator
   after the chain has started.

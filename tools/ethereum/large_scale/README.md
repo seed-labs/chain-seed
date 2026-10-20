@@ -9,7 +9,7 @@
 Use the separate [transaction generator](../transaction_generator/README.md) to prepare contracts,
 send transactions and collect receipts.
 
-Use [Lookingglass](../lookingglass/README.md) to view deployment and observation data.
+Use [Lookingglass](../../../docs/user_manual/blockchain/lookingglass.md) to view deployment and observation data.
 
-See the [E12 manual](../../../examples/ethereum/E12_large_scale/README.md) for the commands in order.
+See the [E10 manual](../../../examples/ethereum/E10_large_scale/README.md) for the commands in order.
 Use each script's `--help` option for its arguments.

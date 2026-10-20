@@ -44,7 +44,7 @@ def record_environment(compose, run_dir):
     transaction_tools = Path(__file__).parent.parent / 'transaction_generator'
     sources.extend(p for p in transaction_tools.rglob('*') if p.suffix in ('.py', '.json') and p.is_file()
                    and 'results' not in p.relative_to(transaction_tools).parts)
-    example = Path(__file__).resolve().parents[3] / 'examples/ethereum/E12_large_scale'
+    example = Path(__file__).resolve().parents[3] / 'examples/ethereum/E10_large_scale'
     sources.extend(p for p in example.glob('*') if p.suffix in ('.py', '.sh') and p.is_file())
     report['source_sha256'] = {str(p.resolve()): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     path = run_dir / 'provenance.json'

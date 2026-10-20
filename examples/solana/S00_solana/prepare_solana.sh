@@ -213,7 +213,7 @@ PY
 
 log "building seedemu-solana base image ($PLATFORM) ..."
 docker build --platform "$PLATFORM" "${BUILD_NETWORK_ARGS[@]}" "${BUILD_ARGS[@]}" \
-  -t seedemu-solana "$REPO_ROOT/images/solana" \
+  -t seedemu-solana "$REPO_ROOT/docker_images/solana" \
   || { fail "base image build failed"; exit 1; }
 ok "base image ready."
 

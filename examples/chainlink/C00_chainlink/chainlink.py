@@ -10,9 +10,9 @@ if str(REPO_ROOT) not in sys.path:
 
 from seedemu import *
 from chainseed.compiler import ChainSeedDocker
-from chainseed.ethereum import *
-from chainseed.chainlink import *
-from chainseed.chainlink.ChainlinkTemplates import *
+from chainseed.services.ethereum import *
+from chainseed.services.chainlink import *
+from chainseed.services.chainlink.ChainlinkTemplates import *
 from examples.ethereum.E00_ethereum_poa import ethereum_poa
 import os
 import random

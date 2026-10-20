@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from seedemu import *
-from chainseed.ethereum import *
+from chainseed.services.ethereum import *
 
 DOMAIN = ".net"
 

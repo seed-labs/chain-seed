@@ -1,4 +1,4 @@
-FROM us-docker.pkg.dev/oplabs-tools-artifacts/images/op-node:v1.4.3 as node
+FROM us-docker.pkg.dev/oplabs-tools-artifacts/docker_images/op-node:v1.4.3 as node
 
 FROM ghcr.io/foundry-rs/foundry:latest
 

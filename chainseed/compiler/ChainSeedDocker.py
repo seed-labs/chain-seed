@@ -45,7 +45,7 @@ class ChainSeedDocker(Docker):
         beacon_vnode: str | None = None,
     ) -> "ChainSeedDocker":
         """Enable the ChainSeed EthExplorer deployment component."""
-        from ..ethereum.EthExplorer import (
+        from ..services.ethereum.EthExplorer import (
             ETH_EXPLORER_BACKEND_IMAGE,
             ETH_EXPLORER_WEB_IMAGE,
             EthExplorer,

@@ -77,13 +77,14 @@ chain-seed/
 │   ├── extension.py
 │   ├── common/
 │   ├── compiler/
-│   ├── ethereum/
-│   │   └── LookingglassServer/
-│   ├── monero/
-│   ├── solana/
-│   ├── chainlink/
+│   ├── services/
+│   │   ├── ethereum/
+│   │   │   └── LookingglassServer/
+│   │   ├── monero/
+│   │   ├── solana/
+│   │   └── chainlink/
 │   └── testing/
-├── images/
+├── docker_images/
 │   ├── ethereum/
 │   ├── ethexplorer/
 │   ├── monero/
@@ -102,7 +103,7 @@ chain-seed/
 │   ├── ethereum/
 │   │   ├── E00_ethereum_poa/
 │   │   ├── ...
-│   │   ├── E12_large_scale/
+│   │   ├── E10_large_scale/
 │   │   └── ...
 │   ├── monero/
 │   │   ├── M00_monero/
@@ -150,10 +151,10 @@ chain-seed/
 flowchart TD
     Public["chainseed 公共 API"]
     Common["chainseed.common"]
-    Ethereum["chainseed.ethereum"]
-    Monero["chainseed.monero"]
-    Solana["chainseed.solana"]
-    Chainlink["chainseed.chainlink"]
+    Ethereum["chainseed.services.ethereum"]
+    Monero["chainseed.services.monero"]
+    Solana["chainseed.services.solana"]
+    Chainlink["chainseed.services.chainlink"]
     Observability["chainseed.observability"]
     Testing["chainseed.testing"]
     SeedCore["seedemu.core 公共 API"]
@@ -209,7 +210,7 @@ ChainSeed 只依赖一组较小的公共接口，不依赖编译器内部实现�
 
 ```python
 from seedemu import Binding, Emulator, Filter
-from chainseed.ethereum import ConsensusMechanism, EthereumService
+from chainseed.services.ethereum import ConsensusMechanism, EthereumService
 ```
 
 以下方式被删除：
@@ -374,7 +375,7 @@ dataset_id, schema_version, source_uri, sha256, bytes,
 created_at, generator_commit, seedemu_version, chainseed_version
 ```
 
-大规模部署示例分别位于 `examples/ethereum/E12_large_scale/`、
+大规模部署示例分别位于 `examples/ethereum/E10_large_scale/`、
 `examples/monero/M01_large_scale/` 和 `examples/solana/S01_large_scale/`，观测与负载工具
 位于 `tools/<protocol>/`。生成的部署和采样数据不提交到 Git。
 

@@ -10,7 +10,7 @@ import pytest
 import yaml
 
 from chainseed import ChainSeedDocker
-from chainseed.ethereum import ConsensusMechanism, EthereumService
+from chainseed.services.ethereum import ConsensusMechanism, EthereumService
 from seedemu.core import Action, Binding, Emulator, Filter
 from seedemu.layers import Base, Routing
 
@@ -223,7 +223,7 @@ def test_runtime_validator_cannot_silently_ignore_multiplexing(network):
 
 
 def test_lookingglass_respects_metrics_port_and_disabled_endpoint(monkeypatch):
-    from chainseed.ethereum.LookingglassServer import app as server
+    from chainseed.services.ethereum.LookingglassServer import app as server
 
     requests = []
     monkeypatch.setattr(server, 'fetch', lambda url, **kwargs: requests.append(url) or '')
@@ -300,7 +300,7 @@ def test_explorer_explicit_targets_reach_compose_and_selected_network(network, t
 
 
 def test_explorer_auto_and_partial_selection_use_eligible_servers(network):
-    from chainseed.ethereum import EthExplorer
+    from chainseed.services.ethereum import EthExplorer
 
     emu, system, _, servers = network
     servers['g1'].enableGethHttp().setGethHttpPort(9546)
@@ -317,7 +317,7 @@ def test_explorer_auto_and_partial_selection_use_eligible_servers(network):
 
 
 def test_explorer_invalid_targets_fail_without_falling_back(network):
-    from chainseed.ethereum import EthExplorer
+    from chainseed.services.ethereum import EthExplorer
 
     emu, system, _, servers = network
     servers['g1'].enableGethHttp()
@@ -341,7 +341,7 @@ def test_explorer_invalid_targets_fail_without_falling_back(network):
 
 @pytest.mark.parametrize('role', ['Geth', 'Beacon'])
 def test_explorer_reports_no_eligible_automatic_target(network, role):
-    from chainseed.ethereum import EthExplorer
+    from chainseed.services.ethereum import EthExplorer
 
     emu, _, _, servers = network
     if role == 'Beacon':
@@ -354,7 +354,7 @@ def test_explorer_reports_no_eligible_automatic_target(network, role):
 
 
 def test_explorer_selector_arguments_validate_before_render():
-    from chainseed.ethereum import EthExplorer
+    from chainseed.services.ethereum import EthExplorer
 
     for selectors in ({'geth_vnode': ''}, {'geth_vnode': 1},
                       {'beacon_vnode': ' '}, {'beacon_vnode': False}):

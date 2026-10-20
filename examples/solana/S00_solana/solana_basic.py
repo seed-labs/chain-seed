@@ -15,7 +15,7 @@ The cluster runs natively on both amd64 and arm64: the seedemu-solana base image
 downloads Agave's prebuilt binaries on amd64 and compiles them from source on
 arm64. Build the base image once before compiling:
 
-    docker build -t seedemu-solana ../../../images/solana
+    docker build -t seedemu-solana ../../../docker_images/solana
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ from examples.ethereum.E00_ethereum_poa import mini_internet
 from seedemu import Binding, Filter, Makers
 from seedemu.compiler import Platform
 from chainseed.compiler import ChainSeedDocker
-from chainseed.solana import SolanaService
+from chainseed.services.solana import SolanaService
 
 
 def _bind(emu, vnode: str, asn: int, host_index: int, display_name: str) -> None:

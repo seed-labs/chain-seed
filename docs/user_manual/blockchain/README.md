@@ -9,8 +9,8 @@
 
   - [Build a blockchain emulator (POA)](../../../examples/ethereum/E00_ethereum_poa)
   - [Funding accounts at build time](./accounts.md)
-  - [Use faucet to fund accounts](../../../examples/ethereum/E06_faucet)
-  - [Deploy contract](../../../examples/ethereum/E07_deploy_contract)
+  - [Use faucet to fund accounts](../../../examples/ethereum/E04_faucet)
+  - [Deploy contract](../../../examples/ethereum/E05_deploy_contract)
   - [Use a server to share information among nodes](./info_server.md)
 
 

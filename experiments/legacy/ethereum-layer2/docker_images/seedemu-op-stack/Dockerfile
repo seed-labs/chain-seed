@@ -1,7 +1,7 @@
-FROM us-docker.pkg.dev/oplabs-tools-artifacts/images/op-batcher:v1.4.3 as batcher
-FROM us-docker.pkg.dev/oplabs-tools-artifacts/images/op-node:v1.4.3 as node
-FROM us-docker.pkg.dev/oplabs-tools-artifacts/images/op-proposer:v1.4.3 as proposer
-FROM us-docker.pkg.dev/oplabs-tools-artifacts/images/op-geth:v1.101308.0 as geth
+FROM us-docker.pkg.dev/oplabs-tools-artifacts/docker_images/op-batcher:v1.4.3 as batcher
+FROM us-docker.pkg.dev/oplabs-tools-artifacts/docker_images/op-node:v1.4.3 as node
+FROM us-docker.pkg.dev/oplabs-tools-artifacts/docker_images/op-proposer:v1.4.3 as proposer
+FROM us-docker.pkg.dev/oplabs-tools-artifacts/docker_images/op-geth:v1.101308.0 as geth
 
 FROM alpine:3.14
 

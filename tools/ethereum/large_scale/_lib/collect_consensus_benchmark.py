@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Collect raw consensus timing data for E12 Ethereum benchmark experiments."""
+"""Collect raw consensus timing data for E10 Ethereum benchmark experiments."""
 
 from __future__ import annotations
 

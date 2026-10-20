@@ -32,10 +32,10 @@ cross-AS enodes, dump reuse, legacy/PoS commands and invalid peer declarations.
 
 `test_example_network.py` checks mini/hybrid networks and `.bin` reuse.
 `test_lookingglass_server.py` checks the global inventory, defaults, native Docker
-port publication, runtime files, optional observations and E12 mount compatibility.
-`test_e05_lookingglass.py` checks E05 defaults and verifies that its runtime test
+port publication, runtime files, optional observations and E10 mount compatibility.
+`test_e03_lookingglass.py` checks E03 defaults and verifies that its runtime test
 rejects stale, missing and configured-only observations. Run the Docker checks
-manually with `chainseed-test all examples/ethereum/E05_lookingglass/example.yaml`.
+manually with `chainseed-test all examples/ethereum/E03_lookingglass/example.yaml`.
 `check_repository_boundaries.py --seedemu ../seed-emulator` checks source
 ownership, removed API references, and Python syntax across both repositories.
 SeedEmu retains its legacy blockchain sources; boundary checks enforce ChainSEED

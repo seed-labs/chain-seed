@@ -11,7 +11,7 @@ import yaml
 from seedemu.core import Action, Binding, Emulator, Filter
 from seedemu.layers import Base, Routing
 from chainseed import ChainSeedDocker
-from chainseed.ethereum import ConsensusMechanism, EthereumService
+from chainseed.services.ethereum import ConsensusMechanism, EthereumService
 
 
 class PackageIntegrationTests(unittest.TestCase):
@@ -104,7 +104,7 @@ class PackageIntegrationTests(unittest.TestCase):
                 self.assertEqual(host.getImportedFiles()["/usr/bin/geth"], str(binary.resolve()))
 
     def test_monero(self):
-        from chainseed.monero import MoneroService
+        from chainseed.services.monero import MoneroService
 
         emulator = self.make_emulator(["seed", "client"])
         service = MoneroService()
@@ -115,7 +115,7 @@ class PackageIntegrationTests(unittest.TestCase):
         self.compile(emulator)
 
     def test_monero_custom_image_is_applied_by_plugin_compiler(self):
-        from chainseed.monero import MoneroService
+        from chainseed.services.monero import MoneroService
 
         emulator = self.make_emulator(["seed"])
         service = MoneroService()
@@ -127,7 +127,7 @@ class PackageIntegrationTests(unittest.TestCase):
         self.assertIn("FROM chainseed-monero-fixture:static", self.compiled_dockerfiles)
 
     def test_monero_seed_connection_policies_reach_start_scripts(self):
-        from chainseed.monero import MoneroSeedConnectionMode, MoneroService
+        from chainseed.services.monero import MoneroSeedConnectionMode, MoneroService
 
         flags = {
             MoneroSeedConnectionMode.EXCLUSIVE: "--add-exclusive-node",
@@ -178,7 +178,7 @@ class PackageIntegrationTests(unittest.TestCase):
                         self.assertCountEqual(actual, expected)
 
     def test_solana(self):
-        from chainseed.solana import SolanaService
+        from chainseed.services.solana import SolanaService
 
         emulator = self.make_emulator(["bootstrap", "validator"])
         service = SolanaService()
@@ -189,7 +189,7 @@ class PackageIntegrationTests(unittest.TestCase):
         self.compile(emulator)
 
     def test_chainlink(self):
-        from chainseed.chainlink import ChainlinkService
+        from chainseed.services.chainlink import ChainlinkService
 
         emulator = self.make_emulator(["geth", "faucet", "utility", "oracle", "user"])
         ethereum = EthereumService()

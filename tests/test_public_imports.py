@@ -10,10 +10,10 @@ class PublicImportTests(unittest.TestCase):
         self.assertEqual(ChainSeedDocker().getName(), "ChainSeedDocker")
 
     def test_chain_public_imports(self):
-        from chainseed.chainlink import ChainlinkService
-        from chainseed.ethereum import ConsensusMechanism, EthExplorer, EthereumService
-        from chainseed.monero import MoneroService
-        from chainseed.solana import SolanaService
+        from chainseed.services.chainlink import ChainlinkService
+        from chainseed.services.ethereum import ConsensusMechanism, EthExplorer, EthereumService
+        from chainseed.services.monero import MoneroService
+        from chainseed.services.solana import SolanaService
 
         self.assertEqual(ConsensusMechanism.POS.value, "POS")
         self.assertTrue(

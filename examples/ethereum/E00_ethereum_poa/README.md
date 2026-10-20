@@ -48,7 +48,7 @@ e = blockchain.createNode('node0')
 ```
 
 Each node can be configured and customized using the provided APIs. See the
-[`EthereumServer`](../../../chainseed/ethereum/EthereumServer.py)
+[`EthereumServer`](../../../chainseed/services/ethereum/EthereumServer.py)
 class for the supported APIs.
 
 
@@ -82,9 +82,9 @@ two servers, they are two essential elements in the SEED
 blockchain emulator. 
 
 These two servers are not used in this example. The faucet 
-server is used in the example [E06_faucet](../E06_faucet), while the 
+server is used in the example [E04_faucet](../E04_faucet), while the
 utility server is used in the example
-[E07_deploy_contract](../E07_deploy_contract) to help deploy
+[E05_deploy_contract](../E05_deploy_contract) to help deploy
 smart contracts. 
 
 

@@ -78,13 +78,14 @@ chain-seed/
 │   ├── extension.py
 │   ├── common/
 │   ├── compiler/
-│   ├── ethereum/
-│   │   └── LookingglassServer/
-│   ├── monero/
-│   ├── solana/
-│   ├── chainlink/
+│   ├── services/
+│   │   ├── ethereum/
+│   │   │   └── LookingglassServer/
+│   │   ├── monero/
+│   │   ├── solana/
+│   │   └── chainlink/
 │   └── testing/
-├── images/
+├── docker_images/
 │   ├── ethereum/
 │   ├── ethexplorer/
 │   ├── monero/
@@ -103,7 +104,7 @@ chain-seed/
 │   ├── ethereum/
 │   │   ├── E00_ethereum_poa/
 │   │   ├── ...
-│   │   ├── E12_large_scale/
+│   │   ├── E10_large_scale/
 │   │   └── ...
 │   ├── monero/
 │   │   ├── M00_monero/
@@ -152,10 +153,10 @@ after at least two chain implementations require the same abstraction.
 flowchart TD
     Public["chainseed public API"]
     Common["chainseed.common"]
-    Ethereum["chainseed.ethereum"]
-    Monero["chainseed.monero"]
-    Solana["chainseed.solana"]
-    Chainlink["chainseed.chainlink"]
+    Ethereum["chainseed.services.ethereum"]
+    Monero["chainseed.services.monero"]
+    Solana["chainseed.services.solana"]
+    Chainlink["chainseed.services.chainlink"]
     Observability["chainseed.observability"]
     Testing["chainseed.testing"]
     SeedCore["seedemu.core public API"]
@@ -212,7 +213,7 @@ The public import style is explicit:
 
 ```python
 from seedemu import Binding, Emulator, Filter
-from chainseed.ethereum import ConsensusMechanism, EthereumService
+from chainseed.services.ethereum import ConsensusMechanism, EthereumService
 ```
 
 The following style is removed:
@@ -385,7 +386,7 @@ dataset_id, schema_version, source_uri, sha256, bytes,
 created_at, generator_commit, seedemu_version, chainseed_version
 ```
 
-Large-scale deployment examples live in `examples/ethereum/E12_large_scale/`,
+Large-scale deployment examples live in `examples/ethereum/E10_large_scale/`,
 `examples/monero/M01_large_scale/` and `examples/solana/S01_large_scale/`,
 with observation and workload tools under `tools/<protocol>/`. Generated
 deployments and sampled data are not committed to Git.

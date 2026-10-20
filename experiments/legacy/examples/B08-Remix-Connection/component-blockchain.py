@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-from chainseed.ethereum import *
+from chainseed.services.ethereum import *
 from seedemu import *
 
 emu = Emulator()

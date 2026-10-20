@@ -9,7 +9,7 @@ environment. Run these commands from this example directory.
 Build the shared Agave image once:
 
 ```bash
-docker build -t seedemu-solana ../../../images/solana
+docker build -t seedemu-solana ../../../docker_images/solana
 python solana_large_scale.py
 ```
 

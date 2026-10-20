@@ -27,7 +27,7 @@ import sys
 from seedemu import Binding, Filter, Makers
 from seedemu.compiler import Platform
 from chainseed.compiler import ChainSeedDocker
-from chainseed.monero import (
+from chainseed.services.monero import (
     MoneroBinarySource,
     MoneroMiningTrigger,
     MoneroNetworkType,

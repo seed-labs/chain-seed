@@ -32,7 +32,7 @@ ChainSeed 服务通过 SeedEmu 现有的 `Node.setBaseSystem` API 声明与编�
 镜像和部署组件。ChainSeed 不再依赖 SeedEmu 的区块链镜像表；区块链实现、
 镜像、示例和协议测试由本仓库负责。SeedEmu Docker 仍保留旧实现；ChainSEED 独立使用本仓库的区块链实现。
 EthExplorer 部署也由 ChainSeed 负责：Python 集成位于
-`chainseed.ethereum.EthExplorer`，镜像配方保留在 `images/ethexplorer`。
+`chainseed.services.ethereum.EthExplorer`，镜像配方保留在 `docker_images/ethexplorer`。
 SeedEmu 只为编译器子类提供受保护的 Compose 附加服务钩子；`ChainSeedDocker`
 覆写该钩子，并完整拥有 EthExplorer 服务定义与网络接入。上游旧 Explorer 路径仍保留，ChainSEED 使用自己的组件。
 
@@ -113,9 +113,9 @@ ChainSeed 示例不再依赖 SeedEmu 源码中的顶层 `examples` 目录。
 ```python
 from seedemu import Binding, Emulator, Filter
 from chainseed import ChainSeedDocker
-from chainseed.ethereum import ConsensusMechanism, EthereumService
-from chainseed.monero import MoneroService
-from chainseed.solana import SolanaService
+from chainseed.services.ethereum import ConsensusMechanism, EthereumService
+from chainseed.services.monero import MoneroService
+from chainseed.services.solana import SolanaService
 ```
 
 ## 版本兼容与首次 1.0.0 发布
@@ -147,7 +147,7 @@ ChainSeed 当前没有单独的 upstream，可以直接从当前远端发布。�
 
 ```text
 chainseed/       Python 服务层和协议感知测试
-images/          区块链客户端与 Explorer 镜像配方
+docker_images/   区块链客户端与 Explorer 镜像配方
 tools/           Explorer、钱包和区块链工具
 examples/        按链种分类的示例：chainlink、ethereum、monero、solana
 experiments/     历史原型和示例

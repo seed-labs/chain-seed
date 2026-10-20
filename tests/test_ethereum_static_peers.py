@@ -12,7 +12,7 @@ import tomli
 import yaml
 
 from chainseed import ChainSeedDocker
-from chainseed.ethereum import ConsensusMechanism, EthereumService
+from chainseed.services.ethereum import ConsensusMechanism, EthereumService
 from seedemu.core import Action, Binding, Emulator, Filter
 from seedemu.layers import Base, Routing
 

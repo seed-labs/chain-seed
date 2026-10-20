@@ -20,7 +20,7 @@ import sys
 from seedemu import Binding, Filter, Makers
 from seedemu.compiler import Platform
 from chainseed.compiler import ChainSeedDocker
-from chainseed.monero import MoneroBinarySource, MoneroMiningTrigger, MoneroService
+from chainseed.services.monero import MoneroBinarySource, MoneroMiningTrigger, MoneroService
 
 CUSTOM_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "custom")) # The directory containing your custom Monero binaries
 CUSTOM_BIN_FILES = {

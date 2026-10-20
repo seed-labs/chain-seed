@@ -17,7 +17,7 @@ from seedemu import Binding, Emulator, Filter
 from seedemu.compiler import BASE_IMAGE, DockerImage, Platform
 from seedemu.layers import EtcHosts
 from chainseed import ChainSeedDocker
-from chainseed.solana import SolanaService
+from chainseed.services.solana import SolanaService
 
 # Defaults from the final 200-node experiment. No alternate runtime modes.
 SLOTS_PER_EPOCH = 262144

@@ -35,8 +35,8 @@ ChainSeed-owned profiles to platform-specific images and deployment components. 
 implementations, images, examples, and protocol tests are owned by this
 repository. SeedEmu Docker retains its legacy blockchain implementations; ChainSEED operates independently of them.
 EthExplorer deployment is also owned by ChainSeed. The Python integration
-lives in `chainseed.ethereum.EthExplorer`, while build recipes remain in
-`images/ethexplorer`. SeedEmu supplies protected Docker compiler hooks for subclasses to extend image
+lives in `chainseed.services.ethereum.EthExplorer`, while build recipes remain in
+`docker_images/ethexplorer`. SeedEmu supplies protected Docker compiler hooks for subclasses to extend image
 catalogs and contribute auxiliary Compose services. `ChainSeedDocker` overrides
 those hooks and owns all
 EthExplorer service definitions and network attachment. The legacy SeedEmu Explorer path remains upstream; ChainSEED uses its own component.
@@ -124,9 +124,9 @@ Use explicit chain imports:
 ```python
 from seedemu import Binding, Emulator, Filter
 from chainseed import ChainSeedDocker
-from chainseed.ethereum import ConsensusMechanism, EthereumService
-from chainseed.monero import MoneroService
-from chainseed.solana import SolanaService
+from chainseed.services.ethereum import ConsensusMechanism, EthereumService
+from chainseed.services.monero import MoneroService
+from chainseed.services.solana import SolanaService
 ```
 
 ## Version compatibility and initial 1.0.0 release
@@ -160,7 +160,7 @@ semantic-versioned. A tested compatibility matrix belongs in each release.
 
 ```text
 chainseed/       Python service layers and protocol-aware testing
-images/          Blockchain client and explorer image recipes
+docker_images/   Blockchain client and explorer image recipes
 tools/           Explorer, wallet, and blockchain support tools
 examples/        Examples grouped by chain: chainlink, ethereum, monero and solana
 experiments/     Archived prototypes and examples

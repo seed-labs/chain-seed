@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from chainseed.ethereum import Blockchain
+from chainseed.services.ethereum import Blockchain
 from .EthUtil import CustomGenesis
 
 class CustomBlockchain(Blockchain):

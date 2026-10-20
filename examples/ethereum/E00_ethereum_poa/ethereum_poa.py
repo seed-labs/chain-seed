@@ -16,7 +16,7 @@ if str(REPO_ROOT) not in sys.path:
 from chainseed.compiler import ChainSeedDocker
 from seedemu import *
 from examples.ethereum.E00_ethereum_poa import mini_internet
-from chainseed.ethereum import *
+from chainseed.services.ethereum import *
 from examples.ethereum.E00_ethereum_poa import component_poa
 
 def run(dumpfile=None, hosts_per_as=3, total_eth_nodes=20, total_accounts_per_node=2, network_dumpfile=None):

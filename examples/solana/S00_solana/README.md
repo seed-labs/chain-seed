@@ -68,7 +68,7 @@ The equivalent manual flow, from this directory, is:
 
 ```bash
 # 1. Build the Solana base image
-docker build -t seedemu-solana ../../../images/solana
+docker build -t seedemu-solana ../../../docker_images/solana
 
 # 2. Generate the emulation (defaults to the host architecture; or pass amd|arm)
 python3 solana_basic.py
@@ -272,7 +272,7 @@ Notes:
   `configure()`. No IPs/ASNs are hard-coded in the service.
 - **P5 (real production software):** runs real `agave-validator` /
   `solana-genesis` / `solana-faucet`, pinned to a specific Agave release in
-  `images/solana/Dockerfile`.
+  `docker_images/solana/Dockerfile`.
 - **P6 (self-contained module):** `SolanaService` exposes a small high-level API
   (`createBlockchain`, `createBootstrapValidator`, `createValidator`) and hides
   all genesis/keypair/faucet boilerplate.

@@ -1,6 +1,6 @@
 # Ethereum Lookingglass
 
-See [E05](../../../examples/ethereum/E05_lookingglass/) for a complete deployment and runtime tests.
+See [E03](../../../examples/ethereum/E03_lookingglass/) for a complete deployment and runtime tests.
 
 Create one global viewer in the existing `EthereumService` and bind it to a host:
 
@@ -43,7 +43,7 @@ unavailable. Legacy collector names are associated using AS/host labels from
 the collector's optional `observed-compose.yml`; ambiguous records are omitted.
 Queries add load, so keep the same settings across compared measurements.
 
-`chainseed/ethereum/LookingglassServer/` contains the deployment class
+`chainseed/services/ethereum/LookingglassServer/` contains the deployment class
 (`LookingglassServer.py`), HTTP application (`app.py`), data readers (`sources.py`)
 and web assets (`static/`). Files are loaded through Python package resources;
 deployment does not depend on the source checkout's filesystem location.

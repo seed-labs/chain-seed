@@ -17,7 +17,7 @@ from examples.ethereum.E00_ethereum_poa import mini_internet
 
 from seedemu import *
 from chainseed.compiler import ChainSeedDocker
-from chainseed.ethereum import *
+from chainseed.services.ethereum import *
 
 
 DOMAIN = ".net"

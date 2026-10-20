@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reuse the E12 cgroup scanner without per-container Docker exec."""
+"""Reuse the E10 cgroup scanner without per-container Docker exec."""
 import sys
 import json
 import subprocess

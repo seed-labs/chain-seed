@@ -3,7 +3,7 @@
 # __author__ = 'Demon'
 
 from chainseed.compiler import ChainSeedDocker
-from chainseed.ethereum import *
+from chainseed.services.ethereum import *
 from seedemu.core import Emulator, Binding, Filter
 from seedemu.compiler import Docker
 from seedemu.services import EthereumService

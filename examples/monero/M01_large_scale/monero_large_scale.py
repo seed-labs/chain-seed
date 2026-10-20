@@ -19,7 +19,7 @@ import mini_internet
 from seedemu import Binding, Emulator, Filter
 from seedemu.compiler import BASE_IMAGE, DockerImage, Platform
 from chainseed import ChainSeedDocker
-from chainseed.monero import (MoneroMiningTrigger, MoneroSeedConnectionMode,
+from chainseed.services.monero import (MoneroMiningTrigger, MoneroSeedConnectionMode,
                              MoneroService)
 from tools.blockchain.lib.runtime_mounts import patch_output
 

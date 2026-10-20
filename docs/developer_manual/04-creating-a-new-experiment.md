@@ -15,10 +15,10 @@ The configuration script renders the emulator and compiles it with
 `ChainSeedDocker`. Its generated `output/` should be ready for Docker Compose.
 For large deployments, add separate batching scripts for startup and shutdown.
 The three large-scale examples live under
-`examples/ethereum/E12_large_scale/`, `examples/monero/M01_large_scale/`
+`examples/ethereum/E10_large_scale/`, `examples/monero/M01_large_scale/`
 and `examples/solana/S01_large_scale/`.
 
-Put reusable services and configuration APIs in `chainseed/<protocol>/`.
+Put reusable services and configuration APIs in `chainseed/services/<protocol>/`.
 Observation, workload and summary scripts belong in `tools/<protocol>/`;
 keep their steps independent from compilation and container startup.
 

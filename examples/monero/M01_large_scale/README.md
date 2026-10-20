@@ -12,7 +12,7 @@ commands from this example directory.
 
 The default image is `handsonsecurity/seedemu-monero:latest`, containing
 `monerod`, `monero-wallet-cli` and `monero-wallet-rpc`.
-Its build recipe is in `../../../images/monero`. Pass `--image IMAGE` to use
+Its build recipe is in `../../../docker_images/monero`. Pass `--image IMAGE` to use
 another compatible image extending the SeedEmu base.
 
 ```bash

@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from chainseed.compiler import ChainSeedDocker
-from chainseed.ethereum import *
+from chainseed.services.ethereum import *
 from seedemu import *
 from L2Util import generateAccounts, writeConfig
 from lib.services.EthereumLayer2Service import *

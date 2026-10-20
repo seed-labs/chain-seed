@@ -13,9 +13,9 @@ import yaml
 from seedemu.compiler import Docker
 from seedemu.core import Action, Binding, Emulator, Filter, Server
 from seedemu.layers import Base, Routing
-from chainseed.ethereum import ConsensusMechanism, EthereumService, EthereumServer, LookingglassServer
-from chainseed.ethereum.LookingglassServer.app import PeerProbe, State
-from chainseed.ethereum.LookingglassServer.sources import RunSource
+from chainseed.services.ethereum import ConsensusMechanism, EthereumService, EthereumServer, LookingglassServer
+from chainseed.services.ethereum.LookingglassServer.app import PeerProbe, State
+from chainseed.services.ethereum.LookingglassServer.sources import RunSource
 
 
 ROOT = LookingglassServer.DIR_PREFIX
@@ -143,7 +143,7 @@ def test_native_docker_compiles_host_publication_runtime_and_readonly_mount(tmp_
     subprocess.run(['bash', '-n', str(copies['/start.sh'])], check=True, capture_output=True)
     subprocess.run(['docker', 'compose', '-p', 'lookingglass-test', '-f', str(output / 'docker-compose.yml'),
                     'config', '--quiet'], check=True, capture_output=True)
-    # E12 preserves this node's build while converting client services to mounts.
+    # E10 preserves this node's build while converting client services to mounts.
     from tools.blockchain.lib.runtime_mounts import patch_output
     patch_output(output, output / 'docker-compose.yml', '/seedemu-node', 524288, False, False)
     assert (context / 'Dockerfile').read_text().startswith('FROM handsonsecurity/')
@@ -217,7 +217,7 @@ def test_runtime_resources_work_after_relocation_and_from_zip(tmp_path):
 
 
 def test_static_assets_support_older_runtime_python(monkeypatch):
-    from chainseed.ethereum.LookingglassServer import app
+    from chainseed.services.ethereum.LookingglassServer import app
     monkeypatch.delattr(app.resources, 'files')
     assert b'<!doctype html>' in app.read_static('index.html')
 
