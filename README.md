@@ -31,15 +31,14 @@ compiler refactors do not unnecessarily break the extension.
 Blockchain services are imported from `chainseed.*`.
 ChainSeed services assign compiler-neutral `SystemProfile` objects through
 SeedEmu's existing `Node.setBaseSystem` API. `ChainSeedDocker` maps those
-ChainSeed-owned profiles to platform-specific images and deployment components. ChainSeed no longer depends on SeedEmu's blockchain image table; blockchain
+ChainSeed-owned profiles to platform-specific images. ChainSeed no longer depends on SeedEmu's blockchain image table; blockchain
 implementations, images, examples, and protocol tests are owned by this
 repository. SeedEmu Docker retains its legacy blockchain implementations; ChainSEED operates independently of them.
-EthExplorer deployment is also owned by ChainSeed. The Python integration
-lives in `chainseed.services.ethereum.EthExplorer`, while build recipes remain in
-`docker_images/ethexplorer`. SeedEmu supplies protected Docker compiler hooks for subclasses to extend image
-catalogs and contribute auxiliary Compose services. `ChainSeedDocker` overrides
-those hooks and owns all
-EthExplorer service definitions and network attachment. The legacy SeedEmu Explorer path remains upstream; ChainSEED uses its own component.
+EthExplorer is provided by `chainseed.visualization.EthExplorer`, a SeedEmu
+`ContainerBundle`. Register it with `docker.addContainerBundle(explorer)`;
+SeedEmu Docker compiles the bundle's containers, files and networks. Image
+recipes remain in `docker_images/ethexplorer`. `ChainSeedDocker` currently
+handles blockchain image mappings and Monero custom-image selection.
 
 The optional [Lookingglass viewer](docs/user_manual/blockchain/lookingglass.md) can be
 created with `ethereum.createLookingglassServer()` and bound like a Faucet

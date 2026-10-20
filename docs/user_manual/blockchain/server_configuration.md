@@ -91,12 +91,16 @@ explicit Server API and is rejected during rendering.
 To attach EthExplorer to a particular observation node, use its virtual node name:
 
 ```python
-docker.enableEthExplorer("pos", geth_vnode="geth-0", beacon_vnode="beacon-0")
+from chainseed.visualization import EthExplorer
+
+explorer = EthExplorer(emu, chain_name="pos",
+                       geth_vnode="geth-0", beacon_vnode="beacon-0")
+docker.addContainerBundle(explorer)
 ```
 
 The selected Geth must call `enableGethHttp()` and the selected Beacon must retain
 `setReconstructHistoricStates(True)`. Both must belong to the requested chain.
-Without selectors the component chooses eligible nodes automatically. The
+Without selectors the bundle chooses eligible nodes automatically. The
 configured Geth HTTP RPC port is forwarded to both Explorer services.
 See the [E02 manual](../../../examples/ethereum/E02_eth_explorer/README.md).
 

@@ -29,12 +29,13 @@ ChainSeed 可以导入 `seedemu` 已公开且有文档约束的 API。反方向�
 区块链服务使用 `chainseed.*` 导入。
 ChainSeed 服务通过 SeedEmu 现有的 `Node.setBaseSystem` API 声明与编译器无关的
 `SystemProfile`；`ChainSeedDocker` 再把 ChainSeed 自有 profile 映射为对应平台的
-镜像和部署组件。ChainSeed 不再依赖 SeedEmu 的区块链镜像表；区块链实现、
+镜像。ChainSeed 不再依赖 SeedEmu 的区块链镜像表；区块链实现、
 镜像、示例和协议测试由本仓库负责。SeedEmu Docker 仍保留旧实现；ChainSEED 独立使用本仓库的区块链实现。
-EthExplorer 部署也由 ChainSeed 负责：Python 集成位于
-`chainseed.services.ethereum.EthExplorer`，镜像配方保留在 `docker_images/ethexplorer`。
-SeedEmu 只为编译器子类提供受保护的 Compose 附加服务钩子；`ChainSeedDocker`
-覆写该钩子，并完整拥有 EthExplorer 服务定义与网络接入。上游旧 Explorer 路径仍保留，ChainSEED 使用自己的组件。
+EthExplorer 位于 `chainseed.visualization.EthExplorer`，使用 SeedEmu 的
+`ContainerBundle`，通过 `docker.addContainerBundle(explorer)` 注册。
+SeedEmu Docker 负责编译 Bundle 的容器、文件和网络。镜像配方保留在
+`docker_images/ethexplorer`；`ChainSeedDocker` 当前负责区块链镜像映射和
+Monero 自定义镜像选择。
 
 可调用 `ethereum.createLookingglassServer()` 创建全局
 [Lookingglass](docs/user_manual/blockchain/lookingglass.md)，像 Faucet 一样绑定到仿真主机。

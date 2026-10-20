@@ -1,6 +1,6 @@
 # Test Ownership
 
-Every script in this directory is called by
+Checks and pytest fixtures in this directory run in
 [ChainSeed CI](../.github/workflows/on-pull-request.yaml).
 
 ChainSeed uses the same manifest-driven lifecycle as SeedEmu. Canonical tests
@@ -15,6 +15,9 @@ chainseed-test compile examples/ethereum/E01_ethereum_pos/example.yaml
 chainseed-test all examples/ethereum/E01_ethereum_pos/example.yaml
 ```
 
+`conftest.py` isolates SeedEmu's currently class-level container-bundle list
+between pytest tests. Production multi-compiler isolation needs an upstream fix.
+
 `test_public_imports.py` is a lightweight package/API check. Runtime coverage
 belongs in example manifests and runtime programs, shared by local runs and
 GitHub Actions.
@@ -24,7 +27,9 @@ and verifies the installed ChainSEED wheel and copied examples. Upstream SeedEmu
 currently omits legacy blockchain template assets from its wheel; using its
 source assets avoids the missing upstream wheel resources.
 `test_package_integration.py` compiles Ethereum PoA/PoW/PoS, Explorer, Monero,
-Solana and Chainlink configurations, including a custom Geth binary.
+Solana and Chainlink configurations, including a custom Geth binary. Explorer
+is registered as a ContainerBundle; its native-Docker compilation, endpoint
+selection and API prerequisites are checked by `test_ethereum_runtime_config.py`.
 SeedEmu CI does not install or import ChainSeed.
 
 `test_ethereum_runtime_config.py` checks independent Server tuning through generated

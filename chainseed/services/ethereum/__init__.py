@@ -12,5 +12,4 @@ from .FaucetServer import *
 from .FaucetUtil import *
 from .FaucetUserService import FaucetUserService, FaucetUserServer
 from .EthUtilityServer import EthUtilityServer
-from .EthExplorer import EthExplorer
 from .LookingglassServer import LookingglassServer

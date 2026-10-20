@@ -14,8 +14,8 @@ Currently implemented in the coordinated working trees:
 
 - explicit ChainSeed imports and ordinary `Emulator.addLayer()` integration;
 - ChainSeed-owned `SystemProfile` objects selected by `ChainSeedDocker` through the existing `Node.setBaseSystem` API;
-- protected Docker subclass hooks for system-image catalogs and additional Compose
-  services, used by `ChainSeedDocker` and its EthExplorer component.
+- protected Docker image-catalog hooks for ChainSeed profiles;
+- the public `Docker.addContainerBundle()` API for the EthExplorer bundle.
 
 Planned, but not yet implemented by SeedEmu:
 
@@ -218,13 +218,11 @@ ChainSeed services write only a runtime profile. `ChainSeedDocker` extends the
 protected system-image catalog hook with the `(profile, platform) -> DockerImage`
 mapping and inspects Monero targets for the optional custom-image override.
 
-SeedEmu's Docker compiler also calls a protected additional-services hook while
-assembling Compose output. `ChainSeedDocker` overrides it, asks enabled ChainSeed
-components for service definitions, and resolves emulated network names through
-the inherited protected helper. The protected subclass seam consists of `_getSystemImageCatalog()`,
-`_getAdditionalComposeServices()`, and `_getRealNetName()`. There is no public
-generic Compose registration API. SeedEmu Docker retains its legacy Explorer
-implementation; ChainSEED uses its own component.
+EthExplorer lives in `chainseed.visualization` and inherits SeedEmu's
+`ContainerBundle`. Register it through `Docker.addContainerBundle(explorer)`;
+SeedEmu emits its container services, build files and network configuration.
+The bundle selects the chain and Geth/Beacon endpoints itself. `ChainSeedDocker`
+does not participate in Explorer deployment.
 
 Lookingglass is an ordinary EthereumService Server, created with
 `createLookingglassServer()` and bound to an emulated host. It resolves all

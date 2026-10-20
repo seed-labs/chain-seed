@@ -86,7 +86,10 @@ class PackageIntegrationTests(unittest.TestCase):
         chain.createVcNode("validator").enablePOSValidatorAtGenesis().connectToBeaconNode("beacon")
         chain.createBeaconSetupNode("setup")
         emulator.addLayer(service)
-        compose = self.compile(emulator, ChainSeedDocker().enableEthExplorer("pos"))
+        from chainseed.visualization import EthExplorer
+        compiler = ChainSeedDocker()
+        compiler.addContainerBundle(EthExplorer(emulator, chain_name="pos"))
+        compose = self.compile(emulator, compiler)
         self.assertIn("seedemu-ethexplorer-backend", compose["services"])
 
     def test_legacy_ethereum_and_custom_binary(self):
@@ -210,7 +213,7 @@ class PackageIntegrationTests(unittest.TestCase):
 
         # SeedEmu supplies the required hooks without an API version marker.
         check_seedemu_compatibility()
-        with patch.object(Docker, "_getAdditionalComposeServices", None):
+        with patch.object(Docker, "addContainerBundle", None):
             with self.assertRaisesRegex(RuntimeError, "Docker branch"):
                 check_seedemu_compatibility()
 

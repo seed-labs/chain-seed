@@ -13,6 +13,8 @@ from chainseed import ChainSeedDocker
 from chainseed.services.ethereum import ConsensusMechanism, EthereumService
 from seedemu.core import Action, Binding, Emulator, Filter
 from seedemu.layers import Base, Routing
+from seedemu.compiler import Docker
+from chainseed.visualization import EthExplorer
 
 
 MNEMONIC = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
@@ -279,8 +281,11 @@ def test_explorer_explicit_targets_reach_compose_and_selected_network(network, t
     servers['g0'].setDisplayName('same-name')
     servers['b0'].setReconstructHistoricStates(False)
     emu.render()
-    compiler = ChainSeedDocker(internetMapEnabled=False).enableEthExplorer(
-        'pos', geth_vnode='observer-geth', beacon_vnode='observer-beacon')
+    # Isolate the Bundle integration from ChainSeed's pending image adapter.
+    compiler = Docker(internetMapEnabled=False)
+    compiler.forceImage("ubuntu:24.04")
+    compiler.addContainerBundle(EthExplorer(emu, chain_name='pos',
+        geth_vnode='observer-geth', beacon_vnode='observer-beacon'))
     old_cwd = Path.cwd()
     try:
         output = tmp_path / 'output'
@@ -294,34 +299,47 @@ def test_explorer_explicit_targets_reach_compose_and_selected_network(network, t
     original_net = compiler._getRealNetName(system.getNetwork('net0'))
     for name in ('seedemu-ethexplorer-backend', 'seedemu-ethexplorer-web'):
         spec = compose['services'][name]
-        environment = dict(value.split('=', 1) for value in spec['environment'])
+        environment = spec['environment']
         assert environment == dict(EL_HOST=geth_ip, EL_PORT='9545', CL_HOST=beacon_ip, CL_PORT='8000')
         assert selected_net in spec['networks']
         assert original_net not in spec['networks']
+    # Inspect the actual generated startup scripts, including emulated routing
+    # and both database host replacements, rather than just the Python spec.
+    for name in ('seedemu-ethexplorer-backend', 'seedemu-ethexplorer-web'):
+        context = output / compose['services'][name]['build']
+        dockerfile = (context / 'Dockerfile').read_text()
+        source = next(line.split()[1] for line in dockerfile.splitlines()
+                      if line.startswith('COPY ') and line.split()[2] == '/start.sh')
+        script = context / source
+        body = script.read_text()
+        assert f'DEFAULT_ROUTE="{observer_net.getDefaultRouter()}"' in body
+        assert 'alloyReader' in body and '172.20.0.11' in body
+        subprocess.run(['bash', '-n', str(script)], check=True, capture_output=True)
     subprocess.run(['docker', 'compose', '-p', 'chainseed-explorer-selection-test',
                     '-f', str(output / 'docker-compose.yml'), 'config', '--quiet'],
                    check=True, capture_output=True)
 
 
 def test_explorer_auto_and_partial_selection_use_eligible_servers(network):
-    from chainseed.services.ethereum import EthExplorer
+    from chainseed.visualization import EthExplorer
 
     emu, system, _, servers = network
     servers['g1'].enableGethHttp().setGethHttpPort(9546)
     servers['b0'].setReconstructHistoricStates(False)
     emu.render()
     for selectors in ({}, {'geth_vnode': 'g1'}, {'beacon_vnode': 'b1'}):
-        component = EthExplorer('pos', **selectors)
-        services = component.getComposeServices(emu, lambda net: net.getName())
+        component = EthExplorer(emu, chain_name='pos', **selectors)
+        component.configure()
+        services = {name: container.service for name, container in component.getContainers().items()}
         env = services['seedemu-ethexplorer-backend']['environment']
         geth_ip = system.getHost('g1').getInterfaces()[0].getAddress()
         beacon_ip = system.getHost('b1').getInterfaces()[0].getAddress()
-        assert f'EL_HOST={geth_ip}' in env and 'EL_PORT=9546' in env
-        assert f'CL_HOST={beacon_ip}' in env
+        assert env['EL_HOST'] == str(geth_ip) and env['EL_PORT'] == '9546'
+        assert env['CL_HOST'] == str(beacon_ip)
 
 
 def test_explorer_invalid_targets_fail_without_falling_back(network):
-    from chainseed.services.ethereum import EthExplorer
+    from chainseed.visualization import EthExplorer
 
     emu, system, _, servers = network
     servers['g1'].enableGethHttp()
@@ -340,12 +358,12 @@ def test_explorer_invalid_targets_fail_without_falling_back(network):
              ({'beacon_vnode': 'b0'}, 'requires setReconstructHistoricStates')]
     for selectors, message in cases:
         with pytest.raises(ValueError, match=message):
-            EthExplorer('pos', **selectors).getComposeServices(emu, lambda net: net.getName())
+            EthExplorer(emu, chain_name='pos', **selectors).configure()
 
 
 @pytest.mark.parametrize('role', ['Geth', 'Beacon'])
 def test_explorer_reports_no_eligible_automatic_target(network, role):
-    from chainseed.services.ethereum import EthExplorer
+    from chainseed.visualization import EthExplorer
 
     emu, _, _, servers = network
     if role == 'Beacon':
@@ -354,15 +372,35 @@ def test_explorer_reports_no_eligible_automatic_target(network, role):
         servers['b1'].setReconstructHistoricStates(False)
     emu.render()
     with pytest.raises(ValueError, match=f'needs a {role} server'):
-        EthExplorer('pos').getComposeServices(emu, lambda net: net.getName())
+        EthExplorer(emu, chain_name='pos').configure()
 
 
 def test_explorer_selector_arguments_validate_before_render():
-    from chainseed.services.ethereum import EthExplorer
+    from chainseed.visualization import EthExplorer
 
     for selectors in ({'geth_vnode': ''}, {'geth_vnode': 1},
                       {'beacon_vnode': ' '}, {'beacon_vnode': False}):
         with pytest.raises(ValueError, match='virtual node name'):
-            EthExplorer('pos', **selectors)
-        with pytest.raises(ValueError, match='virtual node name'):
-            ChainSeedDocker().enableEthExplorer('pos', **selectors)
+            EthExplorer(Emulator(), chain_name='pos', **selectors)
+
+
+def test_explorer_bundle_configuration_is_repeatable_and_instance_local(network):
+    from seedemu.containerBundle import ContainerBundle
+
+    emu, _, _, servers = network
+    servers['g1'].enableGethHttp()
+    emu.render()
+    first = EthExplorer(emu, chain_name='pos', port=5050)
+    second = EthExplorer(emu, chain_name='pos', port=5051,
+        backend_image='custom-backend:latest', web_image='custom-web:latest')
+    assert isinstance(first, ContainerBundle)
+    first.configure()
+    first.configure()
+    second.configure()
+    assert len(first.getContainers()) == 7
+    assert first.getContainer('seedemu-ethexplorer-web').service['ports'] == ['5050:5000']
+    assert second.getContainer('seedemu-ethexplorer-web').service['ports'] == ['5051:5000']
+    assert second.getContainer('seedemu-ethexplorer-web').service['image'] == 'custom-web:latest'
+    assert second.getContainer('seedemu-ethexplorer-backend').service['image'] == 'custom-backend:latest'
+    first.getDefaultNetwork()['ip_addresses'][0] = '172.20.0.99'
+    assert second.getDefaultNetwork()['ip_addresses'][0] == '172.20.0.10'

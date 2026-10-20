@@ -79,7 +79,6 @@ runtime:
       services:
         - clickhouse
         - postgres
-        - alloy
         - redis
         - littlebigtable
         - rawbigtable

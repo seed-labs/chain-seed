@@ -11,7 +11,11 @@ class PublicImportTests(unittest.TestCase):
 
     def test_chain_public_imports(self):
         from chainseed.services.chainlink import ChainlinkService
-        from chainseed.services.ethereum import ConsensusMechanism, EthExplorer, EthereumService
+        from chainseed.services.ethereum import ConsensusMechanism, EthereumService
+        from chainseed.visualization import EthExplorer
+        from seedemu.containerBundle import ContainerBundle
+
+        self.assertTrue(issubclass(EthExplorer, ContainerBundle))
         from chainseed.services.monero import MoneroService
         from chainseed.services.solana import SolanaService
 
@@ -83,16 +87,9 @@ class PublicImportTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             pos_node.setBaseSystem("chainseed.ethereum.pos")
 
-        class Sidecar:
-            def getComposeServices(self, emulator, network_name):
-                return {"chainseed-sidecar": {"image": "busybox:latest"}}
-
-        components = ChainSeedDocker(platform=Platform.AMD64)
-        components.addComponent(Sidecar())
-        self.assertEqual(
-            components._getAdditionalComposeServices(Emulator()),
-            {"chainseed-sidecar": {"image": "busybox:latest"}},
-        )
+        self.assertTrue(callable(Docker().addContainerBundle))
+        self.assertFalse(hasattr(ChainSeedDocker, "enableEthExplorer"))
+        self.assertFalse(hasattr(ChainSeedDocker, "addComponent"))
         self.assertFalse(hasattr(Docker(), "addComposeService"))
         self.assertFalse(hasattr(Docker(), "getComposeNetworkName"))
 

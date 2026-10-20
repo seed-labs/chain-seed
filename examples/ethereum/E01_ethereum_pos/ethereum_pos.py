@@ -17,6 +17,7 @@ from examples.ethereum.E00_ethereum_poa import mini_internet
 
 from seedemu import *
 from chainseed.compiler import ChainSeedDocker
+from chainseed.visualization import EthExplorer
 from chainseed.services.ethereum import *
 
 
@@ -209,8 +210,8 @@ def run(
     output_dir.parent.mkdir(parents=True, exist_ok=True)
     docker = ChainSeedDocker(internetMapEnabled=True, platform=platform)
     if ether_view_enabled:
-        docker.enableEthExplorer(chain_name="pos", geth_vnode=explorer_geth_vnode,
-                                 beacon_vnode=explorer_beacon_vnode)
+        docker.addContainerBundle(EthExplorer(emu, chain_name="pos",
+            geth_vnode=explorer_geth_vnode, beacon_vnode=explorer_beacon_vnode))
 
     emu.compile(docker, str(output_dir), override=override)
 

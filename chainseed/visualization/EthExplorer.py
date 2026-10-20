@@ -1,17 +1,36 @@
-from seedemu.containerBundle import ContainerBundle
+"""Ethereum explorer deployed through SeedEmu's ContainerBundle interface."""
 
-SEEDEMU_ETH_EXPLORER_BACKEND_IMAGE = "handsonsecurity/seedemu-ethexplorer-backend:1.0"
-SEEDEMU_ETH_EXPLORER_WEB_IMAGE = "handsonsecurity/seedemu-ethexplorer-web:1.0"
+from copy import deepcopy
+from dataclasses import dataclass
+
+from seedemu.containerBundle import ContainerBundle
+from seedemu.core import Emulator, Network, Node
+from seedemu.core.enums import NetworkType
+
+from ..common.labels import CHAINSEED_LABEL_PREFIX
+from ..services.ethereum.EthereumServer import PoSBeaconServer, PoSGethServer
+from ..services.ethereum.EthereumService import EthereumService
+
+
+ETH_EXPLORER_COMPONENT_LABEL = CHAINSEED_LABEL_PREFIX + "component"
+ETH_EXPLORER_SERVICE_NAMES = (
+    "clickhouse", "postgres", "redis", "littlebigtable", "rawbigtable",
+    "seedemu-ethexplorer-backend", "seedemu-ethexplorer-web",
+)
+
+
+ETH_EXPLORER_BACKEND_IMAGE = "handsonsecurity/seedemu-ethexplorer-backend:1.0"
+ETH_EXPLORER_WEB_IMAGE = "handsonsecurity/seedemu-ethexplorer-web:1.0"
 CLICKHOUSE_IMAGE = "clickhouse/clickhouse-server:25.11"
 POSTGRES_IMAGE = "postgres:15.2-alpine"
 REDIS_IMAGE = "redis:7-alpine"
 LITTLE_BIGTABLE_IMAGE = "gobitfly/little_bigtable:latest"
 
-SEEDEMU_ETH_EXPLORER_WEB_INTERNAL_PORT = 5000
+ETH_EXPLORER_WEB_INTERNAL_PORT = 5000
 
-DOCKER_LOGGOING_SET = {
+DOCKER_LOGGING = {
     "driver": "json-file",
-    "options": {"max-size": "200m", "max-file": 1},
+    "options": {"max-size": "200m", "max-file": "1"},
 }
 
 DEFAULT_NETWORK = {
@@ -130,34 +149,81 @@ FRONTEND_START_SH = [
 ]
 
 
+@dataclass(frozen=True)
+class _Endpoint:
+    address: str
+    network: Network
+    port: int
+
+
 class EthExplorer(ContainerBundle):
-    def __init__(self, emulator, suffix="eth.explorer"):
+    """Attach an explorer bundle to selected Ethereum PoS clients."""
+
+    def __init__(self, emulator: Emulator, suffix: str = "eth.explorer", *,
+                 chain_name: str | None = None, port: int = 5000,
+                 backend_image: str = ETH_EXPLORER_BACKEND_IMAGE,
+                 web_image: str = ETH_EXPLORER_WEB_IMAGE,
+                 geth_vnode: str | None = None, beacon_vnode: str | None = None):
+        if not isinstance(emulator, Emulator):
+            raise TypeError("emulator must be an Emulator")
+        if chain_name is not None and (not isinstance(chain_name, str) or not chain_name.strip()):
+            raise ValueError("chain_name must be a non-empty string")
+        if type(port) is not int or not 1 <= port <= 65535:
+            raise ValueError("port must be an integer between 1 and 65535")
+        for name, value in (("backend_image", backend_image), ("web_image", web_image)):
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"{name} must be a non-empty string")
+        for name, value in (("geth_vnode", geth_vnode), ("beacon_vnode", beacon_vnode)):
+            if value is not None and (not isinstance(value, str) or not value.strip()):
+                raise ValueError(f"{name} must be a non-empty virtual node name or None")
         super().__init__(emulator=emulator, suffix=suffix)
-        self._default_network = DEFAULT_NETWORK
-        service_names = [
-            "clickhouse",
-            "postgres",
-            "redis",
-            "littlebigtable",
-            "rawbigtable",
-            "seedemu-ethexplorer-backend",
-            "seedemu-ethexplorer-web",
-        ]
-        for service_name in service_names:
-            self._createContainer(service_name, suffix)
+        self.__chain_name = chain_name
+        self.__backend_image = backend_image
+        self.__web_image = web_image
+        self.__geth_vnode = geth_vnode
+        self.__beacon_vnode = beacon_vnode
         self.__beacon_host = self.__geth_host = ""
-        self._emu_internal_network = self.getEmuHostNetworkInfo()
+        self._default_network = deepcopy(DEFAULT_NETWORK)
+        self.setPorts([port])
+        for service_name in ETH_EXPLORER_SERVICE_NAMES:
+            self._createContainer(service_name, suffix)
 
     def configure(self) -> None:
         self._required_port_number = 1
         super().configure()
 
+        if not self._emulator.rendered():
+            raise RuntimeError("the emulator must be rendered before configuring EthExplorer")
+        if len(self._ports) != 1 or type(self._ports[0]) is not int or not 1 <= self._ports[0] <= 65535:
+            raise ValueError("EthExplorer requires one valid published port")
         eth = self._emulator.getLayer("EthereumService")
-        blockchain = eth.getBlockchainByName(eth.getBlockchainNames()[0])
-        if not self.__beacon_host:
-            self.__beacon_host = blockchain.getBeaconBootNodeIP()[0]
+        if not isinstance(eth, EthereumService):
+            raise RuntimeError("EthereumService is not installed in the emulator")
+        if self.__chain_name is None:
+            chains = eth.getBlockchainNames()
+            if len(chains) != 1:
+                raise ValueError("EthExplorer requires chain_name when multiple chains exist")
+            self.__chain_name = chains[0]
+        if self.__chain_name not in eth.getBlockchainNames():
+            raise ValueError(f"EthExplorer chain {self.__chain_name!r} does not exist")
+        geth, geth_node = self.__select_target(eth, PoSGethServer, "Geth", self.__geth_vnode)
+        _, beacon_node = self.__select_target(eth, PoSBeaconServer, "Beacon", self.__beacon_vnode)
+        execution = self.__endpoint(geth_node, geth.getGethHttpPort())
+        consensus = self.__endpoint(beacon_node, 8000)
         if not self.__geth_host:
-            self.__geth_host = blockchain.getGethBootNodeIP()[0]
+            self.__geth_host = execution.address
+        if not self.__beacon_host:
+            self.__beacon_host = consensus.address
+        network = execution.network
+        scope, _, _ = network.getRegistryInfo()
+        router = network.getDefaultRouter()
+        if router is None:
+            raise RuntimeError("EthExplorer's emulated network needs a default router")
+        self._emu_internal_network = dict(network=f"net_{scope}_{network.getName()}",
+            hostname=geth_node.getName(), ip_address=execution.address,
+            default_route=str(router))
+        environment = dict(CL_HOST=self.__beacon_host, CL_PORT=str(consensus.port),
+                           EL_HOST=self.__geth_host, EL_PORT=str(execution.port))
 
         default_network_name = self._default_network["name"]
         ip_addresses = self._default_network["ip_addresses"]
@@ -243,7 +309,7 @@ class EthExplorer(ContainerBundle):
         seedemu_ethexplorer_backend = self._containers["seedemu-ethexplorer-backend"]
         seedemu_ethexplorer_backend.setContentAttribute(
             {
-                "image": SEEDEMU_ETH_EXPLORER_BACKEND_IMAGE,
+                "image": self.__backend_image,
                 "privileged": True,
                 "pid": "host",
                 "cap_add": ["ALL"],
@@ -264,9 +330,9 @@ class EthExplorer(ContainerBundle):
                     "littlebigtable": {"condition": "service_started"},
                     "rawbigtable": {"condition": "service_started"},
                 },
-                "environment": {"CL_HOST": self.__beacon_host, "EL_HOST": self.__geth_host},
+                "environment": environment.copy(),
                 "build": f"./{seedemu_ethexplorer_backend.getHostname()}",
-                "logging": DOCKER_LOGGOING_SET,
+                "logging": DOCKER_LOGGING,
             }
         )
         seedemu_ethexplorer_backend.joinInternalNetwork(**self._emu_internal_network)
@@ -289,7 +355,7 @@ class EthExplorer(ContainerBundle):
         seedemu_ethexplorer_web = self._containers["seedemu-ethexplorer-web"]
         seedemu_ethexplorer_web.setContentAttribute(
             {
-                "image": SEEDEMU_ETH_EXPLORER_WEB_IMAGE,
+                "image": self.__web_image,
                 "privileged": True,
                 "pid": "host",
                 "cap_add": ["ALL"],
@@ -301,10 +367,10 @@ class EthExplorer(ContainerBundle):
                     "rawbigtable": {"condition": "service_started"},
                     seedemu_ethexplorer_backend.getName(): {"condition": "service_healthy"},
                 },
-                "environment": {"CL_HOST": self.__beacon_host, "EL_HOST": self.__geth_host},
-                "ports": [f"{self._ports.pop()}:{SEEDEMU_ETH_EXPLORER_WEB_INTERNAL_PORT}"],
+                "environment": environment.copy(),
+                "ports": [f"{self._ports[0]}:{ETH_EXPLORER_WEB_INTERNAL_PORT}"],
                 "build": f"./{seedemu_ethexplorer_web.getHostname()}",
-                "logging": DOCKER_LOGGOING_SET,
+                "logging": DOCKER_LOGGING,
             }
         )
         seedemu_ethexplorer_web.joinInternalNetwork(**self._emu_internal_network)
@@ -324,6 +390,9 @@ class EthExplorer(ContainerBundle):
         ]
         seedemu_ethexplorer_web._start_commands = frontend_start_commands
 
+        for container in self._containers.values():
+            container.service["labels"] = {ETH_EXPLORER_COMPONENT_LABEL: "ethexplorer"}
+
     def getBeaconHost(self) -> str:
         return self.__beacon_host
 
@@ -335,3 +404,84 @@ class EthExplorer(ContainerBundle):
 
     def setGethHost(self, geth_host) -> None:
         self.__geth_host = geth_host
+
+
+    def __select_target(self, ethereum: EthereumService, server_type, role: str,
+                        vnode: str | None):
+        if vnode is not None:
+            server = ethereum.getPendingTargets().get(vnode)
+            if server is None:
+                raise ValueError(f"EthExplorer {role} virtual node {vnode!r} does not exist")
+            if not isinstance(server, server_type):
+                raise ValueError(f"EthExplorer virtual node {vnode!r} must be a PoS {role} server")
+            if server.getBlockchain().getChainName() != self.__chain_name:
+                raise ValueError(f"EthExplorer virtual node {vnode!r} is not in chain {self.__chain_name!r}")
+            self.__require_capability(server, role, vnode)
+            for target_server, node in ethereum.getTargets():
+                if target_server is server:
+                    return server, node
+            raise RuntimeError(f"EthExplorer virtual node {vnode!r} has no rendered target")
+
+        targets = [
+            (server, node)
+            for server, node in ethereum.getTargets()
+            if isinstance(server, server_type)
+            and server.getBlockchain().getChainName() == self.__chain_name
+        ]
+        if not targets:
+            raise RuntimeError(
+                "EthExplorer chain {} has no rendered PoS {} node".format(
+                    self.__chain_name,
+                    role,
+                )
+            )
+        targets = [(server, node) for server, node in targets if self.__capable(server, role)]
+        if not targets:
+            requirement = ("enableGethHttp()" if role == "Geth" else
+                           "setReconstructHistoricStates(True)")
+            raise ValueError(f"EthExplorer chain {self.__chain_name!r} needs a {role} server with {requirement}")
+        targets.sort(
+            key=lambda target: (
+                target[1].getRegistryInfo(),
+                target[0].getId(),
+            )
+        )
+        return targets[0]
+
+
+    @staticmethod
+    def __capable(server, role):
+        return (server.isGethHttpEnabled() if role == "Geth" else
+                server.isReconstructHistoricStatesEnabled())
+
+
+    def __require_capability(self, server, role, vnode):
+        if not self.__capable(server, role):
+            requirement = ("enableGethHttp()" if role == "Geth" else
+                           "setReconstructHistoricStates(True)")
+            raise ValueError(f"EthExplorer virtual node {vnode!r} requires {requirement} before render()")
+
+
+    def __endpoint(self, node: Node, port: int) -> _Endpoint:
+        interfaces = [
+            interface
+            for interface in node.getInterfaces()
+            if interface.getNet().getType() == NetworkType.Local
+        ]
+        if not interfaces:
+            raise RuntimeError(
+                "EthExplorer endpoint as{}/{} has no local network interface".format(
+                    node.getAsn(),
+                    node.getName(),
+                )
+            )
+        interface = interfaces[0]
+        address = interface.getAddress()
+        if address is None:
+            raise RuntimeError(
+                "EthExplorer endpoint as{}/{} has no IP address".format(
+                    node.getAsn(),
+                    node.getName(),
+                )
+            )
+        return _Endpoint(str(address), interface.getNet(), port)

@@ -11,7 +11,7 @@ import urllib.request
 from typing import Any, Callable, Dict, Iterable, Optional
 
 from chainseed.testing import EthereumRuntimeTest
-from chainseed.services.ethereum.EthExplorer import (
+from chainseed.visualization.EthExplorer import (
     ETH_EXPLORER_COMPONENT_LABEL,
     ETH_EXPLORER_SERVICE_NAMES,
 )

@@ -22,6 +22,10 @@ def main():
     from chainseed.services.ethereum import EthereumService
     from chainseed.services.monero import MoneroService
     from chainseed.services.solana import SolanaService
+    from chainseed.visualization import EthExplorer
+    from seedemu.containerBundle import ContainerBundle
+
+    assert issubclass(EthExplorer, ContainerBundle)
 
     assert "site-packages" in str(Path(chainseed.__file__).resolve())
     assert metadata.metadata("chainseed")["Name"] == "chainseed"

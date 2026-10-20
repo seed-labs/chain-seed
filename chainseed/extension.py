@@ -38,10 +38,10 @@ def check_seedemu_compatibility() -> None:
     if (
         not hasattr(core, "SystemProfile")
         or not callable(getattr(Docker, "_getSystemImageCatalog", None))
-        or not callable(getattr(Docker, "_getAdditionalComposeServices", None))
+        or not callable(getattr(Docker, "addContainerBundle", None))
     ):
         raise RuntimeError(
-            "chainseed requires SeedEmu SystemProfile and Docker extension hooks; "
+            "chainseed requires SeedEmu SystemProfile, image catalog hooks and ContainerBundle support; "
             "install SeedEmu from the Docker branch. The distribution "
             "version alone does not identify these capabilities."
         )

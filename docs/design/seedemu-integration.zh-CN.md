@@ -13,8 +13,8 @@ ChainSEED 当前适配SeedEmu `Docker` 分支，发行版本为
 
 - 显式导入 ChainSeed，并通过普通的 `Emulator.addLayer()` 完成集成；
 - 通过现有 `Node.setBaseSystem` API 声明 ChainSeed 自有 `SystemProfile`，并由 `ChainSeedDocker` 完成选择；
-- 受保护的 Docker 子类钩子，用于扩展系统镜像目录和附加 Compose 服务，
-  由 `ChainSeedDocker` 及其 EthExplorer 组件使用。
+- 通过受保护的 Docker 镜像目录钩子接入 ChainSeed profile；
+- EthExplorer 通过公开的 `Docker.addContainerBundle()` 接入容器编译。
 
 SeedEmu 尚未实现、仍属于计划的内容：
 
@@ -210,12 +210,10 @@ ChainSeed 服务只写入运行 profile。`ChainSeedDocker` 通过覆写受保�
 目录钩子，加入`（profile，目标平台） -> DockerImage` 映射，并在编译时读取
 Monero 服务目标以处理可选的自定义镜像。
 
-SeedEmu 的 Docker 编译器在组装 Compose 时还会调用一个受保护的附加服务钩子。
-`ChainSeedDocker` 覆写该钩子，从已启用的 ChainSeed 组件收集服务定义，并通过
-继承的受保护方法解析仿真网络名称。该受保护的子类扩展点由 `_getSystemImageCatalog()`、
-`_getAdditionalComposeServices()` 和 `_getRealNetName()` 组成。SeedEmu 不提供
-公开的通用 Compose 注册 API。SeedEmu Docker 保留旧 Explorer 实现，
-ChainSEED 使用自己的组件。
+EthExplorer 位于 `chainseed.visualization`，继承 SeedEmu 的 `ContainerBundle`。
+通过 `Docker.addContainerBundle(explorer)` 注册后，由 SeedEmu 生成其容器服务、
+构建文件和网络配置。链与 Geth/Beacon 端点选择由 Explorer 自己完成，
+`ChainSeedDocker` 不再参与 Explorer 部署。
 
 Lookingglass 是 EthereumService 下的普通 Server，通过
 `createLookingglassServer()` 创建并绑定到仿真主机。它在 configure 阶段汇总所有链的
