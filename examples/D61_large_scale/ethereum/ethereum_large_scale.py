@@ -179,6 +179,13 @@ def run(output=SCRIPT_DIR / "output", beacons=100, stub_as_count=64,
         lookingglass_run_dir=None, geth_cache_mib=GETH_CACHE_MIB,
         reconstruct_historic_states=True):
     placements, counts = plan_placements(beacons, stub_as_count)
+    viewer_placement = None
+    if lookingglass:
+        asn = min(counts)
+        viewer_placement = Placement(asn, f"host_{counts[asn]:03d}")
+        counts[asn] += 1
+        if counts[asn] > mini_internet.MAX_HOSTS_PER_STUB_AS:
+            raise ValueError("Lookingglass needs one additional host; increase stub_as_count")
     config = dict(beacons=beacons, geth=beacons, validator_clients=beacons * 3 // 2,
         keys_per_client=keys_per_client, active_validators=beacons * 3 // 2 * keys_per_client,
         worker_cap=worker_cap, geth_cache_mib=geth_cache_mib,
@@ -188,7 +195,8 @@ def run(output=SCRIPT_DIR / "output", beacons=100, stub_as_count=64,
         placements={name: asdict(p) for name, p in placements.items()},
         host_counts=counts)
     if lookingglass:
-        config["lookingglass"] = dict(port=lookingglass_port, probe_peers=True)
+        config["lookingglass"] = dict(port=lookingglass_port, probe_peers=True,
+                                      placement=asdict(viewer_placement))
     if min(accounts, keys_per_client, worker_cap, geth_gomemlimit_mib, beacon_peers) < 1 or accounts < 2:
         raise ValueError("Counts/budgets must be positive and accounts >=2")
     if type(genesis_delay) is not int or genesis_delay < 0:
@@ -220,11 +228,19 @@ def run(output=SCRIPT_DIR / "output", beacons=100, stub_as_count=64,
                            geth_cache_mib=geth_cache_mib, geth_gomemlimit_mib=geth_gomemlimit_mib,
                            genesis_delay=genesis_delay,
                            reconstruct_historic_states=reconstruct_historic_states)
+    if lookingglass:
+        system = emu.getLayer("Base").getAutonomousSystem(viewer_placement.asn)
+        try:
+            system.getHost(viewer_placement.host)
+        except (AssertionError, KeyError):
+            system.createHost(viewer_placement.host).joinNetwork("net0")
+        viewer = emu.getLayer("EthereumService").createLookingglassServer()
+        viewer.setPort(lookingglass_port)
+        if lookingglass_run_dir is not None:
+            viewer.setObservationDirectory(lookingglass_run_dir)
+        _bind(emu, "lookingglass", viewer_placement)
     emu.render()
     compiler = ChainSeedDocker(platform=Platform.AMD64, internetMapEnabled=False)
-    if lookingglass:
-        compiler.enableLookingglass("pos-large", port=lookingglass_port,
-                                    run_dir=lookingglass_run_dir)
     if image:
         base = emu.getLayer("Base")
         for placement in placements.values():

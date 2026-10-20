@@ -10,7 +10,7 @@
 <main>
  <section id="network-summary" class="panel network-summary" aria-label="Network workload summary"></section>
  <section class="workspace">
-  <div class="toolbar"><div class="tabs" role="tablist" aria-label="Network layer"><button class="active" data-layer="beacon" role="tab">Beacon peers</button><button data-layer="geth" role="tab">Geth peers</button><button data-layer="service" role="tab">Service map</button></div><div class="filters"><label>AS<select id="asn"><option value="all">All AS</option></select></label><label>Color<select id="color"><option value="role">Role</option><option value="memory">Memory</option><option value="queue">API P0</option><option value="head">Head slot</option></select></label></div></div>
+  <div class="toolbar"><div class="tabs" role="tablist" aria-label="Network layer"><button data-layer="beacon" role="tab">Beacon peers</button><button data-layer="geth" role="tab">Geth peers</button><button class="active" data-layer="service" role="tab">Service map</button></div><div class="filters"><label>Chain<select id="chain"><option value="all">All chains</option></select></label><label>AS<select id="asn"><option value="all">All AS</option></select></label><label>Color<select id="color"><option value="role">Role</option><option value="memory">Memory</option><option value="queue">API P0</option><option value="head">Head slot</option></select></label></div></div>
   <div class="searchline"><input id="search" type="search" placeholder="Find node, IP, AS, slot or full transaction / block hash" aria-label="Search"><button id="clear">Reset</button><button id="svg-export">Export map SVG</button></div>
   <div class="map-heading"><div><span class="eyebrow" id="map-kicker">OBSERVED CONNECTIONS</span><h2 id="map-title">Beacon peer network</h2></div><span id="counts" class="muted"></span></div>
   <div id="graph-wrap"><svg id="graph" viewBox="0 0 1050 570" role="img" aria-label="Network topology"></svg><div id="empty" hidden></div></div>
@@ -25,6 +25,6 @@
   <p id="replay-note" class="muted"></p><div id="events" class="event-list"></div>
  </section>
 </main>
-<footer><span>SEED / D61 · Independent observation attachment</span><span id="footer-note">No chain controls. No inferred forwarding paths.</span></footer>
+<footer><span>ChainSeed · Ethereum Lookingglass</span><span id="footer-note">No chain controls. No inferred forwarding paths.</span></footer>
 <script src="/app.js"></script>
 </body></html>

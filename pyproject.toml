@@ -43,7 +43,7 @@ where = ["."]
 include = ["chainseed*"]
 
 [tool.setuptools.package-data]
-"chainseed.ethereum.lookingglass" = ["static/*"]
+"chainseed.ethereum.LookingglassServer" = ["static/*"]
 "chainseed.ethereum.EthTemplates" = [
   "files_ethereum/*",
   "files_faucet/*",

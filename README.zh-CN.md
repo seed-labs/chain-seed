@@ -36,9 +36,10 @@ EthExplorer 部署也由 ChainSeed 负责：Python 集成位于
 SeedEmu 只为编译器子类提供受保护的 Compose 附加服务钩子；`ChainSeedDocker`
 覆写该钩子，并完整拥有 EthExplorer 服务定义与网络接入。上游旧 Explorer 路径仍保留，ChainSEED 使用自己的组件。
 
-可在编译前调用 `docker.enableLookingglass("pos", port=8765)`，把
-[Lookingglass](tools/ethereum/lookingglass/README.md) 加入部署。不调用则不生成该服务；
-启用后随 Compose 启停。运行代码和网页资源均包含在 ChainSeed 安装包内。
+可调用 `ethereum.createLookingglassServer()` 创建全局
+[Lookingglass](docs/user_manual/blockchain/lookingglass.md)，像 Faucet 一样绑定到仿真主机。
+它展示全部 Ethereum 链，默认自动映射宿主机 8765 端口；不创建则不启动。
+运行代码和网页资源均包含在 ChainSeed 安装包内。
 
 生成的 Compose 输出、客户端数据库、大规模原始采样、数据集、Python 缓存
 和 Node 依赖缓存不提交到 Git。

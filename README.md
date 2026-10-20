@@ -41,10 +41,10 @@ catalogs and contribute auxiliary Compose services. `ChainSeedDocker` overrides
 those hooks and owns all
 EthExplorer service definitions and network attachment. The legacy SeedEmu Explorer path remains upstream; ChainSEED uses its own component.
 
-The optional [Lookingglass viewer](tools/ethereum/lookingglass/README.md) can be
-included with `docker.enableLookingglass("pos", port=8765)` before compilation.
-Its runtime and web assets are packaged with ChainSeed; the generated Compose
-service starts and stops with the deployment.
+The optional [Lookingglass viewer](docs/user_manual/blockchain/lookingglass.md) can be
+created with `ethereum.createLookingglassServer()` and bound like a Faucet
+Server. It displays all Ethereum chains and publishes host port 8765 by default.
+Its runtime and web assets are packaged with ChainSeed.
 
 Generated Compose output, client databases, raw benchmark samples, datasets,
 Python caches, and Node package caches are excluded from Git.

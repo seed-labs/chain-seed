@@ -226,6 +226,12 @@ the inherited protected helper. The protected subclass seam consists of `_getSys
 generic Compose registration API. SeedEmu Docker retains its legacy Explorer
 implementation; ChainSEED uses its own component.
 
+Lookingglass is an ordinary EthereumService Server, created with
+`createLookingglassServer()` and bound to an emulated host. It resolves all
+chains' endpoints during configuration, installs its runtime during rendering,
+and publishes its host port automatically. It uses emulated routes and does not
+depend on compiler component hooks or generated Compose files for its inventory.
+
 ## Package and Import Rules
 
 ChainSeed is expected to depend on and import SeedEmu. The boundary concerns

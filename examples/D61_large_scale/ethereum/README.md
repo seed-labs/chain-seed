@@ -86,19 +86,14 @@ python ethereum_large_scale.py --lookingglass
 ./up.sh
 ```
 
-Open http://127.0.0.1:8765. The batching script builds its small application image
-and starts it with the deployment; `./down.sh` stops it too.
+Open http://127.0.0.1:8765. Lookingglass runs on an additional emulated host and
+shows every Ethereum chain. The batching script builds that host's application
+image and starts it with the deployment; `./down.sh` stops it too.
 Add `--lookingglass-run-dir results/run-1` to show separately collected resources
 and transactions. Node queries work without measurement scripts.
 
-While collection is running, or afterwards:
-
-```bash
-python ../../../tools/ethereum/lookingglass/server.py --run-dir results/run-1
-```
-
-Open http://127.0.0.1:8765. See the [Lookingglass manual](../../../tools/ethereum/lookingglass/README.md)
-for optional peer queries and remote access.
+See the [Lookingglass manual](../../../docs/user_manual/blockchain/lookingglass.md)
+for optional settings.
 
 ## Summarize
 

@@ -217,10 +217,10 @@ SeedEmu 的 Docker 编译器在组装 Compose 时还会调用一个受保护的�
 公开的通用 Compose 注册 API。SeedEmu Docker 保留旧 Explorer 实现，
 ChainSEED 使用自己的组件。
 
-Lookingglass 同样通过 `enableLookingglass()` 注册为可选组件。
-对于需要构建上下文的组件，ChainSeed 编译器在 Compose 生成后调用可选的
-`writeOutputFiles(emulator, output_dir)`，导出运行文件与节点清单。
-这是 ChainSeed 内部的组件接口，无需更改 SeedEmu。
+Lookingglass 是 EthereumService 下的普通 Server，通过
+`createLookingglassServer()` 创建并绑定到仿真主机。它在 configure 阶段汇总所有链的
+节点与端点，在 render 阶段写入运行程序和清单，并自动发布宿主机端口。
+它通过仿真路由访问客户端，不依赖编译器组件钩子或生成后的 Compose 文件。
 
 ## 软件包与导入规则
 

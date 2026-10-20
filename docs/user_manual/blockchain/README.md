@@ -15,6 +15,7 @@
 
 
   - [Configure individual Ethereum clients](./server_configuration.md)
+  - [View all Ethereum chains with Lookingglass](./lookingglass.md)
 
 ## Advanced features 
 

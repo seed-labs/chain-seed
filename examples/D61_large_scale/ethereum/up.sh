@@ -9,7 +9,7 @@ usage() {
     cat <<'EOF'
 Usage: ./up.sh [--output DIR] [--batch-size N] [--jobs N]
 Start an existing output in batches, without testing readiness.
-Uses node base images directly; builds Lookingglass if included.
+Uses node base images directly; builds application services if included.
 COMPOSE_PROJECT_NAME defaults to chainseed-d61. Requires Bash and Compose v2.
 EOF
 }
@@ -35,11 +35,8 @@ trap 'rm -f -- "$services_file"' EXIT
 "${compose[@]}" config --services > "$services_file"
 mapfile -t services < "$services_file"
 (( ${#services[@]} > 0 )) || { printf 'Compose contains no services.\n' >&2; exit 2; }
-for service in "${services[@]}"; do
-    if [[ "$service" == chainseed-lookingglass ]]; then
-        "${compose[@]}" build "$service"
-    fi
-done
+# Client services use runtime mounts; only application services retain builds.
+"${compose[@]}" build
 for (( i=0; i<${#services[@]}; i+=BATCH_SIZE )); do
     end=$((i+BATCH_SIZE < ${#services[@]} ? i+BATCH_SIZE : ${#services[@]}))
     printf 'Starting services %s..%s / %s\n' "$((i+1))" "$end" "${#services[@]}"

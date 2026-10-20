@@ -1,4 +1,4 @@
-"""Read-only adapters. No Docker commands, subprocesses, or experiment writes."""
+"""Lookingglass data readers. No Docker commands, subprocesses, or experiment writes."""
 import csv
 import hashlib
 import io
@@ -170,13 +170,45 @@ class RunSource:
                              "keys": None, "cap": None, **item}
                 for item in self.inventory.get("nodes", [])
             }
-        if not self.nodes:
+        if not self.nodes and not self.inventory_mode:
             raise ValueError("Compose contains no Ethereum PoS Beacon, Geth or Validator nodes")
         self.history = {name: deque(maxlen=60) for name in self.nodes}
         self.last_memory_sample = {}
         self.tail_cache = {}
         self.event_rows = None
         self.event_cache = []
+        self.observation_aliases = {}
+        self._compose_signature = None
+
+    def refresh_aliases(self):
+        """Associate optional legacy collector names by explicit AS/host labels."""
+        if not self.inventory_mode:
+            return
+        try:
+            stat = self.compose.stat()
+            signature = (stat.st_ino, stat.st_size, stat.st_mtime_ns)
+            if signature == self._compose_signature:
+                return
+            doc = yaml.safe_load(self.compose.read_text()) or {}
+        except (OSError, yaml.YAMLError):
+            return
+        aliases = {}
+        for service, spec in doc.get("services", {}).items():
+            labels = spec.get("labels", {})
+            if isinstance(labels, list):
+                labels = dict(item.split("=", 1) for item in labels if "=" in item)
+            matches = [node for node in self.nodes.values()
+                       if node.get("host") == labels.get(PREFIX + "nodename")
+                       and node["asn"] == str(labels.get(PREFIX + "asn"))]
+            # A shared host may have multiple client roles; do not guess an ID.
+            if len(matches) == 1:
+                aliases[spec.get("container_name", service)] = matches[0]["id"]
+        self.observation_aliases = aliases
+        self._compose_signature = signature
+        self.event_rows = None
+
+    def observation_node(self, name):
+        return self.nodes.get(self.observation_aliases.get(name, name))
 
     def tail(self, path, budget=768_000):
         path = Path(path)
@@ -198,11 +230,11 @@ class RunSource:
         rows = self.tail("consensus/block_first_seen.csv", 1_000_000)
         if rows is not self.event_rows:
             self.event_cache = [
-                {"node": row["beacon_name"], "hash": row["head_root"],
+                {"node": self.observation_node(row["beacon_name"])["id"], "hash": row["head_root"],
                  "slot": row["head_slot"], "at": timestamp(row["timestamp"]),
                  "stage": "head (polled)", "evidence": "collector round timestamp", "peer": None}
                 for row in rows
-                if row.get("beacon_name") in self.nodes and row.get("head_root")
+                if self.observation_node(row.get("beacon_name")) is not None and row.get("head_root")
                 and timestamp(row.get("timestamp")) is not None
             ][-4000:]
             self.event_rows = rows
@@ -210,8 +242,9 @@ class RunSource:
 
     def snapshot(self, include_events=True):
         now = time.time()
+        self.refresh_aliases()
         config = read_json(self.run / "deployment.json") or self.config
-        for node in self.nodes.values():
+        for node in ([] if self.inventory_mode else self.nodes.values()):
             if node["role"] == "validator":
                 node["keys"] = config.get("keys_per_client")
             elif node["role"] == "beacon":
@@ -220,7 +253,7 @@ class RunSource:
         relations = {(e["source"], e["target"]): dict(e) for e in self.configured_edges}
         by_ip = {node["ip"]: name for name, node in self.nodes.items() if node["ip"]}
         for row in rows:
-            node = self.nodes.get(row.get("container_name"))
+            node = self.observation_node(row.get("container_name"))
             if not node:
                 continue
             mem = number(row.get("mem_usage_bytes"))
@@ -239,9 +272,9 @@ class RunSource:
                     relations[(node["id"], target)] = {"source": node["id"], "target": target,
                                                        "kind": "service", "at": node["at"]}
         for row in self.tail("consensus/beacon_head_samples.csv"):
-            if row.get("beacon_name") in self.nodes and not row.get("error"):
-                self.nodes[row["beacon_name"]].update(head=number(row.get("head_slot")),
-                                                     head_at=timestamp(row.get("timestamp")))
+            node = self.observation_node(row.get("beacon_name"))
+            if node is not None and not row.get("error"):
+                node.update(head=number(row.get("head_slot")), head_at=timestamp(row.get("timestamp")))
         for node in self.nodes.values():
             node["series"] = list(self.history[node["id"]])
         transactions = {}
@@ -276,7 +309,8 @@ class RunSource:
         )
         return {
             "mode": "live" if self.inventory_mode else "recorded",
-            "run": self.inventory.get("chain", self.run.name), "generated_at": now,
+            "run": self.inventory.get("title", self.inventory.get("chain", self.run.name)),
+            "chains": self.inventory.get("chains", []), "generated_at": now,
             "sample_at": sample_time, "fresh": fresh,
             "probing_allowed": self.inventory_mode or probing_allowed,
             "collector_status": collector.get("status", "not started"),

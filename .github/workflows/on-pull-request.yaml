@@ -94,7 +94,7 @@ jobs:
         run: python -m compileall -q chainseed examples
 
       - name: Check public imports
-        run: python -m pytest -q tests/test_public_imports.py tests/test_package_integration.py tests/test_example_network.py tests/test_runner_commands.py tests/test_ethereum_runtime_config.py tests/test_ethereum_static_peers.py
+        run: python -m pytest -q tests/test_public_imports.py tests/test_package_integration.py tests/test_example_network.py tests/test_runner_commands.py tests/test_ethereum_runtime_config.py tests/test_ethereum_static_peers.py tests/test_lookingglass_server.py
 
       - name: Validate example manifests
         run: |

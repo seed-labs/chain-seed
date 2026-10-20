@@ -1,8 +1,5 @@
 # Blockchain Emulator Tools
 
-- [Ethereum Lookingglass](../ethereum/lookingglass/README.md): deployment, resources,
-  head observations and optional peer/queue/txpool viewing.
-
 - `lib/runtime_mounts.py`: shared compiler-output helper used by large-scale
   Ethereum and Monero examples to mount node configuration into base images.
 - `lib/collect_node_memory.py`: shared container resource collector.

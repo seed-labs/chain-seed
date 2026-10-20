@@ -78,7 +78,7 @@ chain-seed/
 │   ├── common/
 │   ├── compiler/
 │   ├── ethereum/
-│   │   └── lookingglass/
+│   │   └── LookingglassServer/
 │   ├── monero/
 │   ├── solana/
 │   ├── chainlink/
@@ -93,7 +93,6 @@ chain-seed/
 │   ├── blockchain/
 │   ├── ethereum/
 │   │   ├── large_scale/
-│   │   ├── lookingglass/
 │   │   └── transaction_generator/
 │   ├── monero/large_scale/
 │   └── solana/large_scale/

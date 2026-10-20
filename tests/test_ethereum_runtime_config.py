@@ -66,6 +66,10 @@ def test_distinct_clients_reach_compiled_scripts_and_processes(network, tmp_path
     servers['v0'].setValidatorKeyCount(2)
     servers['v1'].setValidatorKeyCount(3)
     servers['setup'].setGenesisDelay(1800).setValidatorMnemonic(MNEMONIC)
+    system.createHost('lookingglass').joinNetwork('net0')
+    emu.addBinding(Binding('lookingglass', action=Action.FIRST,
+                           filter=Filter(asn=150, nodeName='^lookingglass$')))
+    emu.getLayer('EthereumService').createLookingglassServer()
     emu.render()
 
     # Run the generated Geth commands against an argv/env recorder. This proves
@@ -122,12 +126,12 @@ def test_distinct_clients_reach_compiled_scripts_and_processes(network, tmp_path
     old_cwd = Path.cwd()
     try:
         output = tmp_path / 'output'
-        compiler = ChainSeedDocker(internetMapEnabled=False).enableLookingglass('pos')
+        compiler = ChainSeedDocker(internetMapEnabled=False)
         emu.compile(compiler, str(output))
     finally:
         os.chdir(old_cwd)
     compose = yaml.safe_load((output / 'docker-compose.yml').read_text())
-    inventory = json.loads((output / 'lookingglass/inventory.json').read_text())
+    inventory = json.loads(content(system.getHost('lookingglass'), '/opt/chainseed/lookingglass/inventory.json'))
     beacons = {node['label']: node for node in inventory['nodes'] if node['role'] == 'beacon'}
     assert beacons['b0']['metrics_port'] == 5055
     assert beacons['b1']['metrics_port'] is None
@@ -219,7 +223,7 @@ def test_runtime_validator_cannot_silently_ignore_multiplexing(network):
 
 
 def test_lookingglass_respects_metrics_port_and_disabled_endpoint(monkeypatch):
-    from chainseed.ethereum.lookingglass import server
+    from chainseed.ethereum.LookingglassServer import app as server
 
     requests = []
     monkeypatch.setattr(server, 'fetch', lambda url, **kwargs: requests.append(url) or '')

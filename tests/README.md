@@ -31,6 +31,8 @@ scripts, compiled Docker files and process arguments, plus genesis/VC key ranges
 cross-AS enodes, dump reuse, legacy/PoS commands and invalid peer declarations.
 
 `test_example_network.py` checks mini/hybrid networks and `.bin` reuse.
+`test_lookingglass_server.py` checks the global inventory, defaults, native Docker
+port publication, runtime files, optional observations and D61 mount compatibility.
 `check_repository_boundaries.py --seedemu ../seed-emulator` checks source
 ownership, removed API references, and Python syntax across both repositories.
 SeedEmu retains its legacy blockchain sources; boundary checks enforce ChainSEED

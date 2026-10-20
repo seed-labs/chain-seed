@@ -2,7 +2,7 @@
 const $ = id => document.getElementById(id);
 const NS = "http://www.w3.org/2000/svg";
 const colors = {beacon: "#087e82", geth: "#b56b26", validator: "#486baf"};
-let data = null, layer = "beacon", selected = null, focus = false, paused = false, objectType = "block", replay = 1, timer = null;
+let data = null, layer = "service", selected = null, focus = false, paused = false, objectType = "block", replay = 1, timer = null;
 let lastObject = "", objectGroups = new Map();
 let followLatest = true;
 const pinned = new Set();
@@ -35,7 +35,7 @@ function renderGraph() {
  const asn=$("asn").value,q=$("search").value.trim().toLowerCase();
  const searchingNode=q && !q.startsWith("0x") && !/^\d+$/.test(q);
  const neighborhood=new Set([selected]);if(focus)for(const e of data.edges){if(e.kind===(layer==="service"?"service":"peer")&&(e.source===selected||e.target===selected)){neighborhood.add(e.source);neighborhood.add(e.target);}}
- let nodes=data.nodes.filter(n=>(layer==="service"||n.role===layer)&&(focus?neighborhood.has(n.id):(asn==="all"||n.asn===asn)));
+ let nodes=data.nodes.filter(n=>(layer==="service"||n.role===layer)&&($("chain").value==="all"||n.chain===$("chain").value)&&(focus?neighborhood.has(n.id):(asn==="all"||n.asn===asn)));
  if(searchingNode)nodes=nodes.filter(n=>[n.label,n.id,n.ip,`AS${n.asn}`].some(v=>v.toLowerCase().includes(q)));
  const aggregate=asn==="all"&&!searchingNode&&!focus;
  const groups=new Map();
@@ -85,7 +85,11 @@ function renderDetail(){
  const focusButton=html("button","focus-button",focus?"Exit neighborhood":"Show neighborhood");focusButton.onclick=()=>{focus=!focus;if(focus){layer=node.role==="validator"?"service":node.role;$("search").value="";document.querySelectorAll("[data-layer]").forEach(b=>b.classList.toggle("active",b.dataset.layer===layer));}renderGraph();renderDetail();};root.append(focusButton);
  const pin=html("button","focus-button",pinned.has(node.id)?"Remove comparison":"Pin for comparison (max 4)");pin.disabled=!pinned.has(node.id)&&pinned.size>=4;pin.onclick=()=>{if(pinned.has(node.id))pinned.delete(node.id);else pinned.add(node.id);renderDetail();renderComparison();};root.append(pin);
  const m=html("div","detail-metrics");for(const [label,value] of [["Memory / GiB",fmt(node.memory_gib,3)],["CPU / % of one core",fmt(node.cpu,1)]]){const tile=html("div","metric");tile.append(html("span","",label),html("strong",value==="Unavailable"?"unknown":"",value));m.append(tile);}root.append(m);
+ if(node.chain)addRow(root,"Chain",`${node.chain} · ${node.consensus} · ID ${node.chain_id}`);
  addRow(root,"Address",node.ip);addRow(root,"Resource sample",age(node.at));
+ if(node.role==="geth"&&node.rpc_port===null)addRow(root,"RPC","Disabled in Server configuration");
+ if(node.role==="beacon"&&node.metrics_port===null)addRow(root,"Metrics","Disabled in Server configuration");
+ if(node.static_peers?.length)addRow(root,"Configured outbound peers",node.static_peers.join(", "));
  if(node.head!=null)addRow(root,"Observed head slot",fmt(node.head,0));
  if(node.cap)addRow(root,"Worker cap (configuration)",node.cap);
  if(node.keys!=null)addRow(root,"Keys / VC (configuration)",node.keys);
@@ -130,6 +134,7 @@ function explorerLink(root,kind,value){if(!data.explorer_url)return;const link=h
 function render(){
  $("mode").textContent=data.mode==="demo"?"SYNTHETIC DEMO":data.mode==="live"?(data.probe_active===undefined?"DEPLOYMENT · PASSIVE":data.fresh?"LIVE · UPDATING":"LIVE · WAITING"):data.collector_status!=="running"?"RECORDED · INACTIVE":data.fresh&&Date.now()/1000-data.sample_at<180?"RECORDED · UPDATING":"RECORDED · STALE";$("mode").classList.toggle("demo",data.mode==="demo");
  $("run").textContent=data.run;renderFreshness();
+ const oldChain=$("chain").value;const chains=[...new Set(data.nodes.map(n=>n.chain).filter(Boolean))].sort();$("chain").replaceChildren(new Option("All chains","all"),...chains.map(c=>new Option(c,c)));$("chain").value=chains.includes(oldChain)?oldChain:"all";
  const old=$("asn").value;const asns=[...new Set(data.nodes.map(n=>n.asn))].sort((a,b)=>Number(a)-Number(b));$("asn").replaceChildren(new Option("All AS","all"),...asns.map(a=>new Option(`AS ${a}`,a)));$("asn").value=asns.includes(old)?old:"all";
  $("footer-note").textContent=data.mode==="demo"?"SYNTHETIC DATA · Never use this fixture as experiment evidence.":`Processor: ${data.processor.source}${data.probe_active===false?" (paused)":""} · Queue deltas require two observations. No inferred forwarding paths.`;
  buildObjects();renderGraph();renderDetail();renderComparison();renderNetworkSummary();
@@ -181,8 +186,9 @@ async function refreshEvents(){
 }
 document.querySelectorAll("[data-layer]").forEach(b=>b.onclick=()=>{layer=b.dataset.layer;focus=false;document.querySelectorAll("[data-layer]").forEach(t=>t.classList.toggle("active",t===b));renderGraph();renderDetail();});
 $("asn").onchange=()=>{focus=false;renderGraph();renderDetail();};$("color").onchange=renderGraph;
+$("chain").onchange=()=>{focus=false;selected=null;renderGraph();renderDetail();};
 $("search").oninput=()=>{if(data){buildObjects();renderGraph();}};
-$("clear").onclick=()=>{$("search").value="";$("asn").value="all";selected=null;focus=false;replay=1;$("time").value=1000;render();};
+$("clear").onclick=()=>{$("search").value="";$("asn").value="all";$("chain").value="all";selected=null;focus=false;replay=1;$("time").value=1000;render();};
 $("object").onchange=()=>{followLatest=false;$("follow").textContent="Follow latest";$("follow").setAttribute("aria-pressed","false");replay=1;$("time").value=1000;renderEvents();renderGraph();};
 $("follow").onclick=()=>{followLatest=!followLatest;if(followLatest){replay=1;$("time").value=1000;}buildObjects();renderGraph();};
 $("blocks-tab").onclick=()=>{objectType="block";$("blocks-tab").classList.add("active");$("tx-tab").classList.remove("active");buildObjects();renderGraph();};

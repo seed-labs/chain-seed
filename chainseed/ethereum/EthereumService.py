@@ -10,6 +10,7 @@ from seedemu.core import Node, Service, Server, Emulator
 from seedemu.core.enums import NetworkType
 from .FaucetServer import FaucetServer
 from .EthUtilityServer import EthUtilityServer
+from .LookingglassServer import LookingglassServer
 from typing import Dict, List
 from sys import stderr
 
@@ -763,6 +764,21 @@ class EthereumService(Service):
         self.__override = override
         self.__blockchains = {}
         self.__blockchain_id = 1337
+        self.__lookingglass = None
+
+    def createLookingglassServer(self, vnode: str = "lookingglass") -> LookingglassServer:
+        """Create the single global viewer, then bind it like any other Server."""
+        if not isinstance(vnode, str) or not vnode.strip():
+            raise ValueError("Lookingglass virtual node name must be a non-empty string")
+        if self.__lookingglass is not None:
+            if self._pending_targets.get(vnode) is self.__lookingglass:
+                return self.__lookingglass
+            raise ValueError("EthereumService supports only one global Lookingglass Server")
+        if vnode in self._pending_targets:
+            raise ValueError(f"Virtual node {vnode!r} already belongs to another Server")
+        self.__lookingglass = LookingglassServer()
+        self._pending_targets[vnode] = self.__lookingglass
+        return self.__lookingglass
 
     def getName(self):
         return 'EthereumService'
@@ -781,6 +797,8 @@ class EthereumService(Service):
         return self.__save_path
 
     def _doConfigure(self, node: Node, server: EthereumServer):
+        if isinstance(server, LookingglassServer):
+            return
         blockchain = server.getBlockchain()
         blockchain._doConfigure(node, server)
     
@@ -791,6 +809,8 @@ class EthereumService(Service):
         for blockchain in self.__blockchains.values():
             blockchain.configure(emulator)
         self._validateMetricsPorts(emulator)
+        if self.__lookingglass is not None:
+            self.__lookingglass.configure(emulator, self)
         for server in self._pending_targets.values():
             if isinstance(server, EthereumServer):
                 server._freezeConfiguration()
@@ -798,7 +818,11 @@ class EthereumService(Service):
     def _validateMetricsPorts(self, emulator: Emulator):
         endpoints = {}
         metrics = []
+        viewers = []
         for vnode, server in self._pending_targets.items():
+            if isinstance(server, LookingglassServer):
+                viewers.append((emulator.getBindingFor(vnode), server.getPort(), vnode))
+                continue
             if not isinstance(server, EthereumServer):
                 continue
             node = emulator.getBindingFor(vnode)
@@ -819,10 +843,11 @@ class EthereumService(Service):
                 ports.append(server.getBootNodeHttpPort())
             for port in ports:
                 endpoints.setdefault((node, port), vnode)
-        for node, port, vnode in metrics:
+        for node, port, vnode in viewers + metrics:
             owner = endpoints.get((node, port))
             if owner is not None:
-                raise ValueError(f"{vnode}: metrics port {port} conflicts with {owner} on the same host")
+                kind = "Lookingglass" if isinstance(self._pending_targets[vnode], LookingglassServer) else "metrics"
+                raise ValueError(f"{vnode}: {kind} port {port} conflicts with {owner} on the same host")
             endpoints[(node, port)] = vnode
         
     def _createSharedFolder(self):
@@ -844,7 +869,9 @@ class EthereumService(Service):
         
     def _doInstall(self, node: Node, server: Server):   ##这里的server是基类 service的render 传进来的
         self._log('installing eth on as{}/{}...'.format(node.getAsn(), node.getName()))
-        if isinstance(server, EthereumServer):
+        if isinstance(server, LookingglassServer):
+            server.install(node)
+        elif isinstance(server, EthereumServer):
             server.install(node, self)
         elif isinstance(server, FaucetServer):
             server.install(node)

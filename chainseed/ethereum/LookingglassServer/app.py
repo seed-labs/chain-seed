@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Standalone Lookingglass. GET-only UI; experiment files are read-only."""
+"""Lookingglass HTTP application. GET-only UI; experiment files are read-only."""
 import argparse
 import copy
 import gzip
@@ -14,16 +14,20 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from collections import deque
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from importlib import resources
 from pathlib import Path
 from urllib.parse import urlparse
 
-if __package__:
-    from .sources import RunSource, demo_snapshot, network_summary, number, recent
-else:
-    from sources import RunSource, demo_snapshot, network_summary, number, recent
+from .sources import RunSource, demo_snapshot, network_summary, number, recent
 
-STATIC = Path(__file__).parent / "static"
 NO_PROXY = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+
+
+def read_static(filename):
+    """Read packaged assets, including on base images with Python 3.8."""
+    if hasattr(resources, "files"):
+        return resources.files(__package__).joinpath("static", filename).read_bytes()
+    return resources.read_binary(__package__ + ".static", filename)
 
 
 def bind_address(value):
@@ -44,7 +48,8 @@ def fetch(url, payload=None, raw=False):
 class PeerProbe:
     """Independent bounded peer and metrics sweeps; no mutating RPC methods."""
     def __init__(self, nodes, live_heads=False):
-        self.nodes = [n for n in nodes if n["role"] in ("beacon", "geth") and n["ip"]]
+        self.nodes = [n for n in nodes if n["role"] in ("beacon", "geth") and n["ip"]
+                      and n.get("rpc_port", 8545 if n["role"] == "geth" else 8000) is not None]
         self.identities = {}
         self.samples = {}
         self.lock = threading.Lock()
@@ -182,8 +187,8 @@ class PeerProbe:
             identities, samples = dict(self.identities), copy.deepcopy(self.samples)
             telemetry = copy.deepcopy(self.telemetry)
             events = list(self.events)
-        by_id = {(n["role"], identities[n["id"]]): n["id"] for n in self.nodes if n["id"] in identities}
-        by_address = {(n["role"], n["ip"]): n["id"] for n in self.nodes}
+        by_id = {(n.get("chain"), n["role"], identities[n["id"]]): n["id"] for n in self.nodes if n["id"] in identities}
+        by_address = {(n.get("chain"), n["role"], n["ip"]): n["id"] for n in self.nodes}
         edges = {}
         for node in data["nodes"]:
             sample = samples.get(node["id"])
@@ -200,10 +205,10 @@ class PeerProbe:
                 if key in sample:
                     node[key] = sample[key]
             for peer in sample.get("ids", []):
-                target = by_id.get((node["role"], peer))
+                target = by_id.get((node.get("chain"), node["role"], peer))
                 matched_by = "peer_id"
                 if not target:
-                    target = by_address.get((node["role"], sample.get("addresses", {}).get(peer)))
+                    target = by_address.get((node.get("chain"), node["role"], sample.get("addresses", {}).get(peer)))
                     matched_by = "connected_peer_address"
                 if target and target != node["id"]:
                     key = tuple(sorted((target, node["id"])))
@@ -309,7 +314,7 @@ def handler_for(state):
                     self.send_error(404)
                     return
                 filename, mime = files[path]
-                body = (STATIC / filename).read_bytes()
+                body = read_static(filename)
             self.send_response(200)
             self.send_header("Content-Type", mime + "; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))

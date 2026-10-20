@@ -263,6 +263,21 @@ def patch_output(
             labels = dict(item.split("=", 1) for item in labels if "=" in item)
         if labels.get("org.seedsecuritylabs.seedemu.meta.chainseed.component"):
             # Auxiliary applications keep their own Docker build context.
+            context = _build_context_path(service.get("build"))
+            if context is not None:
+                node_dir = (output_dir / context).resolve()
+                try:
+                    node_dir.relative_to(output_dir.resolve())
+                except ValueError as exc:
+                    raise PatchError(f"build context escapes output dir: {context}") from exc
+                dockerfile = node_dir / "Dockerfile"
+                lines = dockerfile.read_text().splitlines()
+                for index, line in enumerate(lines):
+                    parts = line.split()
+                    if len(parts) == 2 and parts[0] == "FROM" and parts[1] in dummy_images:
+                        lines[index] = "FROM " + dummy_images[parts[1]]
+                dockerfile.write_text("\n".join(lines) + "\n")
+            _remove_dummy_depends(service, dummy_services)
             continue
         _set_nofile_limit(service, nofile_limit)
         nofile_services += 1
