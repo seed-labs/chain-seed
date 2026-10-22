@@ -2,164 +2,106 @@
 
 中文 | [English](README.md)
 
-ChainSeed 是 [SeedEmu](https://github.com/seed-labs/seed-emulator) 的区块链
-协议扩展仓库，负责 Ethereum、Monero、Solana 和 Chainlink 服务层，以及
-对应的镜像配方、工具、示例、运行时探针和大规模实验定义。
+ChainSeed 是一个基于 [SEED Internet Emulator](https://github.com/seed-labs/seed-emulator)
+构建的可扩展、高保真区块链仿真器。它将真实区块链客户端与可配置的路由网络相结合，
+使研究人员能够在可控的网络条件下研究区块链的性能、安全性和应用。
 
-依赖方向固定为：
+ChainSeed 支持 Ethereum、Monero、Solana 以及 Chainlink 服务，并提供相应的 API 和工具，
+用于配置节点、定制创世状态和节点连接、部署智能合约，以及生成交易负载。
+监控与可视化工具帮助用户查看链上活动和节点运行状态，仓库中的例子涵盖私有测试网络、
+大规模部署和安全实验。
 
-```text
-chain-seed -> seed-emulator
-seed-emulator -X-> chain-seed
-```
+## 安装
 
-## 依赖关系与前置条件
+ChainSeed 依赖 SeedEmu。请参考
+[SeedEmu 安装说明](https://github.com/seed-labs/seed-emulator/blob/development/README.md#getting-started)
+配置所需环境，包括 Python 3.10、Docker Engine 和 Docker Compose，
+然后安装 SeedEmu 的 `development` 分支。
+建议在安装 ChainSeed 前运行一个基础 SeedEmu 例子，确认环境正常。
 
-ChainSeed 是 SeedEmu 的附加扩展，并不是能够单独使用的替代品。用户必须先
-准备好可用的 SeedEmu 源码工作区和 Python 环境。在加入 ChainSeed 前，用户
-应能在同一环境中成功渲染、编译、构建并运行一个不包含区块链的 SeedEmu
-示例。
-
-ChainSeed 可以导入 `seedemu` 已公开且有文档约束的 API。反方向上，SeedEmu
-不得导入或打包 ChainSeed。同时，ChainSeed 服务代码应避免依赖 SeedEmu
-编译器的私有实现，以免 SeedEmu 的正常内部重构不必要地破坏扩展。
-
-## 软件包集成
-
-区块链服务使用 `chainseed.*` 导入。
-ChainSeed 服务通过 SeedEmu 现有的 `Node.setBaseSystem` API 声明与编译器无关的
-`SystemProfile`；`ChainSeedDocker` 再把 ChainSeed 自有 profile 映射为对应平台的
-镜像。ChainSeed 不再依赖 SeedEmu 的区块链镜像表；区块链实现、
-镜像、示例和协议测试由本仓库负责。SeedEmu Docker 仍保留旧实现；ChainSEED 独立使用本仓库的区块链实现。
-EthExplorer 位于 `chainseed.visualization.EthExplorer`，使用 SeedEmu 的
-`ContainerBundle`，通过 `docker.addContainerBundle(explorer)` 注册。
-SeedEmu Docker 负责编译 Bundle 的容器、文件和网络。镜像配方保留在
-`docker_images/ethexplorer`；`ChainSeedDocker` 当前负责区块链镜像映射和
-Monero 自定义镜像选择。
-
-可调用 `ethereum.createLookingglassServer()` 创建全局
-[Lookingglass](docs/user_manual/blockchain/lookingglass.md)，像 Faucet 一样绑定到仿真主机。
-它展示全部 Ethereum 链，默认自动映射宿主机 8765 端口；不创建则不启动。
-运行代码和网页资源均包含在 ChainSeed 安装包内。
-
-生成的 Compose 输出、客户端数据库、大规模原始采样、数据集、Python 缓存
-和 Node 依赖缓存不提交到 Git。
-
-## 普通安装
-
-Python 发行名是 `chainseed`，导入名同样是 `chainseed`；仓库名仍为 `chain-seed`。
-当前支持 Python 3.10，旧版 Web3 5 依赖升级前不支持 Python 3.11 及以上。
-使用 SeedEmu `development` 分支（当前发行版本为 `0.0.7`）。ChainSEED 在导入时
-检查 `SystemProfile` 和 Docker 扩展钩子，版本号本身不足以证明兼容性。
-ChainSEED 尚未发布到 PyPI。
-
-SeedEmu Docker 使用 editable 安装，ChainSEED 使用普通安装：
+将两个仓库克隆到同一个工作目录中，其中 SeedEmu 使用 `development` 分支：
 
 ```bash
-python3.10 -m venv .venv
-source .venv/bin/activate
-python -m pip install -e ../seed-emulator
-python -m pip install .
+mkdir -p workspace
+cd workspace
+
+git clone --branch development https://github.com/seed-labs/seed-emulator.git
+git clone https://github.com/seed-labs/chain-seed.git
 ```
 
-先从 SeedEmu `development` 源码安装，再安装 ChainSEED。虽然 ChainSEED 声明
-了 SeedEmu 依赖，但 PyPI 上同版本的旧构建可能没有所需钩子。
-SeedEmu 独立维护，目前仍保留其旧区块链实现。
-SeedEmu Docker 的普通 wheel 缺少旧区块链模板资源，导入时会失败，
-因此当前使用上述 editable 安装，保留源码目录。此问题需要由上游另行修复。
-Docker、客户端镜像和 Node 工具链不由 Python 包安装提供。
-通用 Docker 网络适配已移至 SeedEmu 的 Docker 分支，ChainSEED 不再覆写网络编译。E01 的 PoS 出块和签名 ETH 转账
-已在 Docker 29.9.0 上验证通过；其他示例仍需动态验证。
-
-## 联合开发安装
-
-推荐将两个仓库放在同一个工作目录下并保持为兄弟目录：
-
 ```text
-seed-workspace/
+workspace/
 ├── seed-emulator/
 └── chain-seed/
 ```
 
-两个仓库在技术上不依赖固定位置，但兄弟目录更便于跨仓库开发和示例复用。
-不要把 ChainSeed clone 到 SeedEmu 仓库内部，以免形成嵌套 Git 仓库。
+进入 `chain-seed` 目录，再选择下面的 Conda 或 uv 安装方式。
+命令中的 `../seed-emulator` 指向同级的 SeedEmu 源码目录。
 
 ```bash
-mkdir seed-workspace
-cd seed-workspace
+cd chain-seed
+```
 
-git clone --branch development https://github.com/seed-labs/seed-emulator.git
-git clone https://github.com/seed-labs/chain-seed.git
+### Conda
 
-python3 -m venv .venv
+```bash
+conda create -n chainseed python=3.10 pip -y
+conda activate chainseed
+python -m pip install -e ../seed-emulator
+python -m pip install .
+```
+
+### uv
+
+```bash
+uv venv --python 3.10
 source .venv/bin/activate
-
-python -m pip install -e ./seed-emulator
-python -m pip install -e "./chain-seed[dev]"
+uv pip install -e ../seed-emulator
+uv pip install .
 ```
 
-本地编译检查和完整 Docker 生命周期使用与 CI 相同的入口：
+SeedEmu 使用可编辑模式安装，因此安装后请保留其源码目录。
+
+## 快速开始
+
+在 `chain-seed` 目录下运行 Ethereum PoS 例子，生成 Docker 部署文件，
+然后构建并启动容器：
 
 ```bash
-chainseed-test compile chain-seed/examples/ethereum/E01_ethereum_pos/example.yaml
-chainseed-test all chain-seed/examples/ethereum/E01_ethereum_pos/example.yaml
+python examples/ethereum/E01_ethereum_pos/ethereum_pos.py
+cd examples/ethereum/E01_ethereum_pos/output
+docker compose build
+docker compose up -d
 ```
 
-共享网络定义位于 `examples/ethereum/E00_ethereum_poa/mini_internet.py`，调用 SeedEmu 公开网络 API，支持 mini/full/hybrid 拓扑和网络 `.bin` 导出。
-ChainSeed 示例不再依赖 SeedEmu 源码中的顶层 `examples` 目录。
-示例脚本仍位于本仓库 `examples/`，使用时保留整个目录。
+如需停止仿真并移除其容器和网络，在 `output` 目录下执行：
 
-路由攻击、拓扑发现和邻居配置示例见 [研究案例](case_study/README.md)。
-
-使用显式导入：
-
-```python
-from seedemu import Binding, Emulator, Filter
-from chainseed import ChainSeedDocker
-from chainseed.services.ethereum import ConsensusMechanism, EthereumService
-from chainseed.services.monero import MoneroService
-from chainseed.services.solana import SolanaService
+```bash
+docker compose down
 ```
 
-## 版本兼容与首次 1.0.0 发布
+配置和访问方法见 [Ethereum PoS 例子](examples/ethereum/E01_ethereum_pos/README.md)。
 
-ChainSeed 与 SeedEmu 独立发布。ChainSeed 可以发布新版本以适配新版
-SeedEmu，而不要求 SeedEmu 同步发版；每个 ChainSeed 版本都必须明确声明
-其支持的 SeedEmu 版本范围。
+区块链配置和部署例子见 [examples](examples/README.md)。复制例子时请保留完整的
+`examples/` 目录，因为部分例子会复用其他例子的代码。
 
-联合开发期间，两个仓库通过普通安装或 editable checkout 安装并一起测试。当前仍
-保留 alpha 版本元数据，不提前声称兼容尚未发布的 SeedEmu API。
+路由攻击、区块链放大攻击、拓扑发现和节点连接实验见
+[case studies](case_study/README.md)。
 
-首次 `1.0.0` 的发布门禁是：
+## 监控与可视化
 
-1. 完成两个仓库中的配套修改；
-2. 本地测试和两个仓库的远端 CI/CD 全部通过；
-3. 将两个项目的发布版本统一修改为 `1.0.0`；
-4. 分别从两个仓库的当前远端发布 `v1.0.0`；
-5. 从这两个 tag 重新安装并运行完整兼容性测试；
-6. 再确认无误后，才向 SeedEmu 的 upstream 提交 PR。
+[EthExplorer](examples/ethereum/E02_eth_explorer/README.md) 提供 Web 界面，
+用于浏览 Ethereum 区块、交易、epoch 和验证者信息。
 
-ChainSeed 当前没有单独的 upstream，可以直接从当前远端发布。此过程中不得
-向 SeedEmu upstream 推送 commit 或 tag。
+[Lookingglass](docs/user_manual/blockchain/lookingglass.md) 提供仿真网络中
+Ethereum 节点、对等连接和运行状态的全局视图。
 
-联合发布后，ChainSeed 应使用有上下界的依赖，例如
-`seedemu>=1.0.0,<2.0.0`；前提是 SeedEmu 对公共扩展 API 遵守语义化版本。
-每次发布都应提供经过测试的兼容矩阵。
+## 文档
 
-目录职责：
+- [使用手册](docs/user_manual/blockchain/README.md)
+- [Ethereum 客户端配置](docs/user_manual/blockchain/server_configuration.md)
+- [交易发生器](tools/ethereum/transaction_generator/README.md)
 
-```text
-chainseed/       Python 服务层和协议感知测试
-docker_images/   区块链客户端与 Explorer 镜像配方
-tools/           Explorer、钱包和区块链工具
-examples/        按链种分类的示例：chainlink、ethereum、monero、solana
-case_study/      路由攻击、拓扑发现与邻居配置示例
-experiments/     历史原型和示例
-tests/           软件包、编译器与运行器检查
-docs/            架构、集成与使用手册
-```
+## 许可证
 
-目标架构和仍需补充的 SeedEmu 公共 API 见
-[docs/design](docs/design/README.zh-CN.md)。
-
-Docker 网络配置沿用 SeedEmu `development` 的默认行为，ChainSeedDocker 不覆写网络编译。
+ChainSeed 采用 [GNU 通用公共许可证第 3 版](LICENSE.txt)。

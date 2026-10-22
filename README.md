@@ -2,176 +2,116 @@
 
 [中文](README.zh-CN.md) | English
 
-ChainSeed provides blockchain protocol extensions for
-[SeedEmu](https://github.com/seed-labs/seed-emulator). It owns Ethereum,
-Monero, Solana, and Chainlink service layers together with their image recipes,
-tools, examples, runtime probes, and large-scale experiment definitions.
+ChainSeed is a scalable, high-fidelity blockchain emulator built on the
+[SEED Internet Emulator](https://github.com/seed-labs/seed-emulator). It combines
+real blockchain clients with configurable routed networks, allowing researchers
+to study blockchain performance, security, and applications under controlled
+network conditions.
 
-The dependency direction is intentionally one way:
+ChainSeed supports Ethereum, Monero, and Solana, together with Chainlink services.
+It provides APIs and tools for configuring nodes, customizing genesis state and
+peer connections, deploying smart contracts, and generating transaction workloads.
+Monitoring and visualization tools help users inspect chain activity and node
+behavior, with examples ranging from private testnets to large-scale deployments
+and security experiments.
 
-```text
-chain-seed -> seed-emulator
-seed-emulator -X-> chain-seed
-```
+## Installation
 
-## Relationship and prerequisites
+ChainSeed depends on SeedEmu. Follow the
+[SeedEmu installation instructions](https://github.com/seed-labs/seed-emulator/blob/development/README.md#getting-started)
+to set up the required environment, including Python 3.10, Docker Engine,
+and Docker Compose, then install SeedEmu from its `development` branch.
+We recommend running a basic SeedEmu example to verify the environment
+before installing ChainSeed.
 
-ChainSeed is an add-on package, not a standalone replacement for SeedEmu. A
-working SeedEmu checkout and Python environment are prerequisites. Before
-adding ChainSeed, users should be able to render, compile, build, and run a
-non-blockchain SeedEmu example in that environment.
-
-ChainSeed may import documented public APIs from `seedemu`. In the opposite
-direction, SeedEmu must never import or package ChainSeed. ChainSeed service
-code should also avoid SeedEmu compiler internals so that normal SeedEmu
-compiler refactors do not unnecessarily break the extension.
-
-## Package integration
-
-Blockchain services are imported from `chainseed.*`.
-ChainSeed services assign compiler-neutral `SystemProfile` objects through
-SeedEmu's existing `Node.setBaseSystem` API. `ChainSeedDocker` maps those
-ChainSeed-owned profiles to platform-specific images. ChainSeed no longer depends on SeedEmu's blockchain image table; blockchain
-implementations, images, examples, and protocol tests are owned by this
-repository. SeedEmu Docker retains its legacy blockchain implementations; ChainSEED operates independently of them.
-EthExplorer is provided by `chainseed.visualization.EthExplorer`, a SeedEmu
-`ContainerBundle`. Register it with `docker.addContainerBundle(explorer)`;
-SeedEmu Docker compiles the bundle's containers, files and networks. Image
-recipes remain in `docker_images/ethexplorer`. `ChainSeedDocker` currently
-handles blockchain image mappings and Monero custom-image selection.
-
-The optional [Lookingglass viewer](docs/user_manual/blockchain/lookingglass.md) can be
-created with `ethereum.createLookingglassServer()` and bound like a Faucet
-Server. It displays all Ethereum chains and publishes host port 8765 by default.
-Its runtime and web assets are packaged with ChainSeed.
-
-Generated Compose output, client databases, raw benchmark samples, datasets,
-Python caches, and Node package caches are excluded from Git.
-
-## Ordinary installation
-
-The Python distribution and import name are both `chainseed`; the repository
-remains `chain-seed`. Python 3.10 is currently supported. The legacy Web3 5
-stack must be upgraded before Python 3.11 and newer can be supported.
-Use the SeedEmu `development` branch (currently packaged as `0.0.7`).
-ChainSEED checks for `SystemProfile`, image catalog hooks and `Docker.addContainerBundle` at import time;
-a version number alone cannot establish compatibility. ChainSEED has not been published to PyPI.
-
-Install SeedEmu from its `development` checkout in editable mode, then install ChainSEED normally:
+Clone both repositories into the same workspace, using the `development` branch
+of SeedEmu:
 
 ```bash
-python3.10 -m venv .venv
-source .venv/bin/activate
-python -m pip install -e ../seed-emulator
-python -m pip install .
+mkdir -p workspace
+cd workspace
+
+git clone --branch development https://github.com/seed-labs/seed-emulator.git
+git clone https://github.com/seed-labs/chain-seed.git
 ```
 
-Install SeedEmu from the `development` checkout first, then install ChainSEED.
-ChainSEED declares SeedEmu as a dependency, but an older PyPI build with the same
-version may lack the required hooks. SeedEmu is maintained independently and
-still retains its legacy blockchain implementation.
-Its ordinary wheel currently omits legacy blockchain templates and fails during
-import. Keep the SeedEmu checkout for the editable installation above until
-upstream packaging is fixed.
-Docker, client images, and Node tooling are separate runtime prerequisites.
-E01 PoS block production and signed ETH transfer validation passed on Docker 29.9.0; other examples still need runtime validation.
-
-## Install for coordinated development
-
-The recommended layout keeps both repositories as siblings under one workspace
-directory:
-
 ```text
-seed-workspace/
+workspace/
 ├── seed-emulator/
 └── chain-seed/
 ```
 
-The repositories do not technically depend on this location, but the sibling
-layout makes cross-repository development and example reuse predictable. Never
-clone ChainSeed inside the SeedEmu repository.
+Enter `chain-seed`, then choose either Conda or uv below. The commands use
+`../seed-emulator` to refer to the sibling SeedEmu checkout.
 
 ```bash
-mkdir seed-workspace
-cd seed-workspace
+cd chain-seed
+```
 
-git clone --branch development https://github.com/seed-labs/seed-emulator.git
-git clone https://github.com/seed-labs/chain-seed.git
+### Conda
 
-python3 -m venv .venv
+```bash
+conda create -n chainseed python=3.10 pip -y
+conda activate chainseed
+python -m pip install -e ../seed-emulator
+python -m pip install .
+```
+
+### uv
+
+```bash
+uv venv --python 3.10
 source .venv/bin/activate
-
-python -m pip install -e ./seed-emulator
-python -m pip install -e "./chain-seed[dev]"
+uv pip install -e ../seed-emulator
+uv pip install .
 ```
 
-Run a local compile-only check or the complete Docker lifecycle with the same
-entry point used by CI:
+SeedEmu is installed in editable mode, so keep its source directory after installation.
+
+## Quick start
+
+From the `chain-seed` directory, run the Ethereum PoS example to generate the
+Docker deployment files, then build and start the containers:
 
 ```bash
-chainseed-test compile chain-seed/examples/ethereum/E01_ethereum_pos/example.yaml
-chainseed-test all chain-seed/examples/ethereum/E01_ethereum_pos/example.yaml
+python examples/ethereum/E01_ethereum_pos/ethereum_pos.py
+cd examples/ethereum/E01_ethereum_pos/output
+docker compose build
+docker compose up -d
 ```
 
-Shared network definitions live in `examples/ethereum/E00_ethereum_poa/mini_internet.py`,
-use public SeedEmu APIs, and support mini/full/hybrid layouts and network `.bin` export. ChainSeed examples no longer depend on the
-SeedEmu checkout's top-level `examples` directory. Example scripts remain in this
-repository; keep the complete `examples/` directory when copying them.
+To stop the emulation and remove its containers and networks, run the following
+command from the `output` directory:
 
-See [case studies](case_study/README.md) for routing attacks, topology discovery and peer configuration.
-
-Use explicit chain imports:
-
-```python
-from seedemu import Binding, Emulator, Filter
-from chainseed import ChainSeedDocker
-from chainseed.services.ethereum import ConsensusMechanism, EthereumService
-from chainseed.services.monero import MoneroService
-from chainseed.services.solana import SolanaService
+```bash
+docker compose down
 ```
 
-## Version compatibility and initial 1.0.0 release
+See the [Ethereum PoS example](examples/ethereum/E01_ethereum_pos/README.md)
+for configuration and access instructions.
 
-ChainSeed releases independently from SeedEmu. A ChainSeed release may adapt
-to a newer SeedEmu without requiring a new SeedEmu release, while every
-ChainSeed release declares the SeedEmu versions it supports.
+See [examples](examples/README.md) for blockchain configurations and deployment
+examples. When copying examples, keep the complete `examples/` directory, as
+some examples reuse code from others.
 
-During coordinated development, both repositories support ordinary or editable
-installation and tested together. The current alpha metadata remains in place and
-does not claim compatibility with an unreleased SeedEmu API.
+See [case studies](case_study/README.md) for experiments on routing attacks,
+blockchain amplification attacks, topology discovery, and node connectivity.
 
-The initial `1.0.0` release gate is:
+## Monitoring and visualization
 
-1. Finish the coordinated changes in both repositories.
-2. Pass local tests and both repositories' remote CI/CD.
-3. Change both projects' release metadata to `1.0.0`.
-4. Publish `v1.0.0` from each repository's current remote.
-5. Reinstall both projects from those tags and rerun the compatibility suite.
-6. Only then open the SeedEmu pull request against its upstream repository.
+[EthExplorer](examples/ethereum/E02_eth_explorer/README.md) provides a web
+interface for browsing Ethereum blocks, transactions, epochs, and validators.
 
-ChainSeed currently has no separate upstream remote and can be released from
-its current remote. The SeedEmu upstream remote must not be pushed to or tagged
-as part of this process.
+[Lookingglass](docs/user_manual/blockchain/lookingglass.md) provides a global
+view of Ethereum nodes, peer connections, and runtime status across the emulated
+network.
 
-After the coordinated release, ChainSeed should use a bounded requirement such
-as `seedemu>=1.0.0,<2.0.0`, provided SeedEmu treats the public extension API as
-semantic-versioned. A tested compatibility matrix belongs in each release.
+## Documentation
 
-## Layout
+- [User guide](docs/user_manual/blockchain/README.md)
+- [Ethereum client configuration](docs/user_manual/blockchain/server_configuration.md)
+- [Transaction generator](tools/ethereum/transaction_generator/README.md)
 
-```text
-chainseed/       Python service layers and protocol-aware testing
-docker_images/   Blockchain client and explorer image recipes
-tools/           Explorer, wallet, and blockchain support tools
-examples/        Examples grouped by chain: chainlink, ethereum, monero and solana
-case_study/      Routing attacks, topology discovery and peer configuration
-experiments/     Archived prototypes and examples
-tests/           Package, compiler and runner checks
-docs/            Architecture, integration and user manuals
-```
+## License
 
-The target architecture and remaining SeedEmu API work are documented in
-[docs/design](docs/design/README.md).
-
-Docker network configuration is inherited from SeedEmu `development`.
-ChainSEED does not override network compilation.
+ChainSeed is licensed under the [GNU General Public License v3.0](LICENSE.txt).
