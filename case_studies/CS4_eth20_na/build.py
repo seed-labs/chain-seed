@@ -15,7 +15,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from seedemu import *
 from seedemu.utilities import Makers
-from chainseed import ChainSeedDocker
+from seedemu.compiler import Docker
 from chainseed.services.ethereum import ConsensusMechanism, EthereumService
 
 # Keep ASNs <=255 because the helper maps ASNs to 10.<asn>.0.0/24 prefixes.
@@ -222,7 +222,7 @@ def main() -> int:
         emu.render()
         output_dir = Path(args.output or SCRIPT_DIR / f"output_tp{args.target_peers}").resolve()
         emu.compile(
-            ChainSeedDocker(internetMapEnabled=False, platform=(Platform.AMD64 if args.platform == "amd" else Platform.ARM64)),
+            Docker(internetMapEnabled=False, platform=(Platform.AMD64 if args.platform == "amd" else Platform.ARM64)),
             str(output_dir),
             override=True,
         )

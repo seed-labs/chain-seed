@@ -14,7 +14,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from seedemu import *
 from seedemu.utilities import Makers
-from chainseed import ChainSeedDocker
+from seedemu.compiler import Docker
 from chainseed.services.ethereum import ConsensusMechanism, EthereumService
 from seedemu.services import ExaBgpService
 
@@ -210,7 +210,7 @@ def main() -> int:
     if args.compile:
         emu.render()
         output_dir = Path(args.output).resolve()
-        ChainSeedDocker(internetMapEnabled=True, platform=(Platform.AMD64 if args.platform == "amd" else Platform.ARM64)).compile(emu, str(output_dir), override=True)
+        Docker(internetMapEnabled=True, platform=(Platform.AMD64 if args.platform == "amd" else Platform.ARM64)).compile(emu, str(output_dir), override=True)
     print(f"wrote {args.manifest}")
     if args.compile:
         print(f"compiled {Path(args.output).resolve()}")
