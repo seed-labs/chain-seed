@@ -4,8 +4,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from case_study.CS1_knockblock import run_attack as attack
-from case_study.CS4_eth20_na import measure
+from case_studies.CS1_knockblock import run_attack as attack
+from case_studies.CS4_eth20_na import measure
 
 
 @pytest.mark.parametrize('http_code,returncode,present', [
@@ -63,7 +63,7 @@ def test_peer_count_mismatch_fails_before_network_queries(tmp_path, monkeypatch)
 
 
 def test_amplification_network_has_room_for_all_client_roles():
-    from case_study.CS2_blockchain_amplification.build import build_emulator
+    from case_studies.CS2_blockchain_amplification.build import build_emulator
     emu, roles = build_emulator(nodes=28, modified_count=0)
     systems = emu.getLayer('Base').getAsns()
     hosts = sum(len(emu.getLayer('Base').getAutonomousSystem(asn).getHosts()) for asn in systems)

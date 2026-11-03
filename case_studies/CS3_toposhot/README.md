@@ -12,10 +12,10 @@ from the repository root, with one deployment active at a time.
 ## Four-role local validation
 
 ```bash
-python case_study/CS3_toposhot/local/build.py --compile
-docker compose -f case_study/CS3_toposhot/local/output/docker-compose.yml up -d --build
-python case_study/CS3_toposhot/local/measure.py --iterations 100 --assert-success
-docker compose -f case_study/CS3_toposhot/local/output/docker-compose.yml down --remove-orphans
+python case_studies/CS3_toposhot/local/build.py --compile
+docker compose -f case_studies/CS3_toposhot/local/output/docker-compose.yml up -d --build
+python case_studies/CS3_toposhot/local/measure.py --iterations 100 --assert-success
+docker compose -f case_studies/CS3_toposhot/local/output/docker-compose.yml down --remove-orphans
 ```
 
 The roles are a synchronization miner and three measured nodes. The measurement
@@ -26,10 +26,10 @@ for a short validation.
 ## 4/6/8/12-node subgroups
 
 ```bash
-python case_study/CS3_toposhot/topology/build.py --nodes 12 --accounts 2000 --compile
-docker compose -f case_study/CS3_toposhot/topology/output/docker-compose.yml up -d --build
-python case_study/CS3_toposhot/topology/measure.py --nodes 12 --group-sizes 4,6,8,12 --account-start 1000 --assert-success
-docker compose -f case_study/CS3_toposhot/topology/output/docker-compose.yml down --remove-orphans
+python case_studies/CS3_toposhot/topology/build.py --nodes 12 --accounts 2000 --compile
+docker compose -f case_studies/CS3_toposhot/topology/output/docker-compose.yml up -d --build
+python case_studies/CS3_toposhot/topology/measure.py --nodes 12 --group-sizes 4,6,8,12 --account-start 1000 --assert-success
+docker compose -f case_studies/CS3_toposhot/topology/output/docker-compose.yml down --remove-orphans
 ```
 
 The default eight families are empty, path, ring, star, balanced bipartite,
@@ -42,17 +42,17 @@ inferred links, precision, recall and transaction evidence.
 For example, run six 32-node families with:
 
 ```bash
-python case_study/CS3_toposhot/topology/build.py --nodes 32 --accounts 6000 --compile
+python case_studies/CS3_toposhot/topology/build.py --nodes 32 --accounts 6000 --compile
 # Start the generated deployment before measuring.
-python case_study/CS3_toposhot/topology/measure.py --nodes 32 --group-sizes 32 --topologies path,ring,star,balanced_bipartite,lollipop,random_deg3 --account-start 1000 --assert-success
+python case_studies/CS3_toposhot/topology/measure.py --nodes 32 --group-sizes 32 --topologies path,ring,star,balanced_bipartite,lollipop,random_deg3 --account-start 1000 --assert-success
 ```
 
 For a 100-node path:
 
 ```bash
-python case_study/CS3_toposhot/topology/build.py --nodes 100 --accounts 7000 --compile
+python case_studies/CS3_toposhot/topology/build.py --nodes 100 --accounts 7000 --compile
 # Start the generated deployment before measuring.
-python case_study/CS3_toposhot/topology/measure.py --nodes 100 --group-sizes 100 --topologies path --account-start 1000
+python case_studies/CS3_toposhot/topology/measure.py --nodes 100 --group-sizes 100 --topologies path --account-start 1000
 ```
 
 Stop the previous deployment before rebuilding. Each deployment includes an

@@ -86,7 +86,7 @@ docker compose down
 `examples/` 目录，因为部分例子会复用其他例子的代码。
 
 路由攻击、区块链放大攻击、拓扑发现和节点连接实验见
-[case studies](case_study/README.md)。
+[case studies](case_studies/README.md)。
 
 ## 监控与可视化
 

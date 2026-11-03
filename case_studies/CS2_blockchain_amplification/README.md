@@ -10,7 +10,7 @@ Go 1.22 and the external author source are required. From the repository root:
 ```bash
 git clone https://github.com/taro-tsuchiya/BlockchainAmplification /tmp/BlockchainAmplification
 git -C /tmp/BlockchainAmplification checkout 51486b72903896f95034c903a3ad3ca4bdde5ed3
-python case_study/CS2_blockchain_amplification/run_author_artifact.py --artifact-dir /tmp/BlockchainAmplification --tests basis,amplification --assert-success
+python case_studies/CS2_blockchain_amplification/run_author_artifact.py --artifact-dir /tmp/BlockchainAmplification --tests basis,amplification --assert-success
 ```
 
 The tests examine honest and attack transactions in the txpool and constructed
@@ -25,9 +25,9 @@ The report records the source commit and Go version.
 with the configured genesis and PoS Engine API:
 
 ```bash
-python case_study/CS2_blockchain_amplification/build.py --nodes 8 --modified-count 1 --custom-geth /path/to/compatible/geth --require-custom-geth --compile
-docker compose -f case_study/CS2_blockchain_amplification/output/docker-compose.yml up -d --build
-docker compose -f case_study/CS2_blockchain_amplification/output/docker-compose.yml down --remove-orphans
+python case_studies/CS2_blockchain_amplification/build.py --nodes 8 --modified-count 1 --custom-geth /path/to/compatible/geth --require-custom-geth --compile
+docker compose -f case_studies/CS2_blockchain_amplification/output/docker-compose.yml up -d --build
+docker compose -f case_studies/CS2_blockchain_amplification/output/docker-compose.yml down --remove-orphans
 ```
 
 The custom binary is configured through each selected Server's `setCustomGeth()`.

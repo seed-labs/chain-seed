@@ -94,7 +94,7 @@ See [examples](examples/README.md) for blockchain configurations and deployment
 examples. When copying examples, keep the complete `examples/` directory, as
 some examples reuse code from others.
 
-See [case studies](case_study/README.md) for experiments on routing attacks,
+See [case studies](case_studies/README.md) for experiments on routing attacks,
 blockchain amplification attacks, topology discovery, and node connectivity.
 
 ## Monitoring and visualization

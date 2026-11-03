@@ -8,10 +8,10 @@ Geth execution node. Keep the network and measurement settings fixed across runs
 Run the following steps from the repository root:
 
 ```bash
-python case_study/CS4_eth20_na/build.py --target-peers 8 --compile
-docker compose -f case_study/CS4_eth20_na/output_tp8/docker-compose.yml up -d --build
-python case_study/CS4_eth20_na/measure.py --target-peers 8 --measure-seconds 180 --sample-interval 1 --ready-timeout 900
-docker compose -f case_study/CS4_eth20_na/output_tp8/docker-compose.yml down --remove-orphans
+python case_studies/CS4_eth20_na/build.py --target-peers 8 --compile
+docker compose -f case_studies/CS4_eth20_na/output_tp8/docker-compose.yml up -d --build
+python case_studies/CS4_eth20_na/measure.py --target-peers 8 --measure-seconds 180 --sample-interval 1 --ready-timeout 900
+docker compose -f case_studies/CS4_eth20_na/output_tp8/docker-compose.yml down --remove-orphans
 ```
 
 Repeat these steps with `7` and `5` in both `--target-peers` and `output_tpN`.

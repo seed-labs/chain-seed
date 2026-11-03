@@ -7,10 +7,10 @@ on [Routing Attacks in Ethereum PoS](https://arxiv.org/abs/2505.07713).
 Run from the repository root:
 
 ```bash
-python case_study/CS1_knockblock/build.py --beacon-nodes 2 --validators-per-beacon 2 --compile
-docker compose -f case_study/CS1_knockblock/output/docker-compose.yml up -d --build
-python case_study/CS1_knockblock/run_attack.py --beacon-nodes 2 --validators-per-beacon 2 --duration 48 --recovery-wait 24 --ready-timeout 900
-docker compose -f case_study/CS1_knockblock/output/docker-compose.yml down --remove-orphans
+python case_studies/CS1_knockblock/build.py --beacon-nodes 2 --validators-per-beacon 2 --compile
+docker compose -f case_studies/CS1_knockblock/output/docker-compose.yml up -d --build
+python case_studies/CS1_knockblock/run_attack.py --beacon-nodes 2 --validators-per-beacon 2 --duration 48 --recovery-wait 24 --ready-timeout 900
+docker compose -f case_studies/CS1_knockblock/output/docker-compose.yml down --remove-orphans
 ```
 
 `build.py` creates the routed network, Geth, Beacon and validator clients, and an
