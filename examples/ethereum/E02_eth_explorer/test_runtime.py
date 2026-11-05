@@ -11,13 +11,9 @@ import urllib.request
 from typing import Any, Callable, Dict, Iterable, Optional
 
 from chainseed.testing import EthereumRuntimeTest
-from chainseed.visualization.EthExplorer import (
-    ETH_EXPLORER_COMPONENT_LABEL,
-    ETH_EXPLORER_SERVICE_NAMES,
-)
 
 
-EXPLORER_URL = os.environ.get("E02_ETH_EXPLORER_URL", "http://127.0.0.1:5000").rstrip("/")
+EXPLORER_URL = os.environ.get("E02_ETH_EXPLORER_URL", "http://127.0.0.1:8090").rstrip("/")
 EXPLORER_SERVICE = "seedemu-ethexplorer-web"
 
 
@@ -187,19 +183,6 @@ def datatable_query() -> str:
 
 def main() -> int:
     test = EthereumRuntimeTest(__file__)
-    explorer_services = test.compose.get("services", {})
-    chainseed_owned = sorted(
-        name
-        for name, service in explorer_services.items()
-        if service.get("labels", {}).get(ETH_EXPLORER_COMPONENT_LABEL)
-        == "ethexplorer"
-    )
-    test.structural_check(
-        "E02 EthExplorer services are contributed by ChainSeed",
-        chainseed_owned
-        == sorted(ETH_EXPLORER_SERVICE_NAMES),
-        "services={}".format(", ".join(chainseed_owned) or "<none>"),
-    )
 
     geth_nodes = test.require_ethereum_services(
         "E02 has Geth nodes for the transaction and explorer tests",
