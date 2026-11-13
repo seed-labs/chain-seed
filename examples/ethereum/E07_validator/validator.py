@@ -152,9 +152,19 @@ def run(
 
     output_dir = Path(output or SCRIPT_DIR / "output").resolve()
     output_dir.parent.mkdir(parents=True, exist_ok=True)
-    docker = ChainSeedDocker(internetMapEnabled=True, platform=platform)
+    docker = ChainSeedDocker(platform=platform)
+    internet_map = InternetMap(emu, ".map.seed.emu")
+    internet_map.setPorts([8091, 8092, 8093])
+    docker.addContainerBundle(internet_map)
     if ether_view_enabled:
-        docker.addContainerBundle(EthExplorer(emu, chain_name="pos"))
+        # Create the explorer bundle; keep the suffix lowercase for Docker image names.
+        eth_explorer = EthExplorer(emu,".eth.seed.emu")
+        # Connect to net0 in AS151 with two addresses for accessing emulated Ethereum nodes.
+        eth_explorer.addInternalNetwork(asn="151", network_name="net0", ip_addresses=["10.151.0.16", "10.151.0.17"])
+        # Expose the explorer web service on host port 8090.
+        eth_explorer.setPorts([8090])
+        # Register the bundle with the Docker compiler to generate its deployment configuration.
+        docker.addContainerBundle(eth_explorer)
 
     emu.compile(docker, str(output_dir), override=override)
 

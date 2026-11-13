@@ -210,7 +210,11 @@ def main() -> int:
     if args.compile:
         emu.render()
         output_dir = Path(args.output).resolve()
-        Docker(internetMapEnabled=True, platform=(Platform.AMD64 if args.platform == "amd" else Platform.ARM64)).compile(emu, str(output_dir), override=True)
+        docker = Docker(platform=(Platform.AMD64 if args.platform == "amd" else Platform.ARM64))
+        internet_map = InternetMap(emu, ".map.seed.emu")
+        internet_map.setPorts([8091, 8092, 8093])
+        docker.addContainerBundle(internet_map)
+        emu.compile(docker, str(output_dir), override=True)
     print(f"wrote {args.manifest}")
     if args.compile:
         print(f"compiled {Path(args.output).resolve()}")

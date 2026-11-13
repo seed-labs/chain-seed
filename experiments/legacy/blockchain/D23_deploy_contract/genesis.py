@@ -71,7 +71,7 @@ def run(dumpfile=None):
         else:
             current_platform = Platform.AMD64
 
-        docker = Docker(platform=current_platform, internetMapEnabled=False)
+        docker = Docker(platform=current_platform)
         emu.compile(docker, "./output", override=True)
 
 

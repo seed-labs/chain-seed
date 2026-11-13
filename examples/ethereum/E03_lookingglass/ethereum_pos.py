@@ -17,6 +17,7 @@ from seedemu.core import Action, Binding, Filter
 from chainseed import ChainSeedDocker
 from chainseed.services.ethereum import PoSBeaconServer
 from examples.ethereum.E01_ethereum_pos import ethereum_pos as e01
+from seedemu.containerBundle import InternetMap
 
 
 def build_emulator():
@@ -43,8 +44,11 @@ def run(output=None, platform=Platform.AMD64, override=False):
     emu.render()
     output = Path(output or SCRIPT_DIR / "output").resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
-    emu.compile(ChainSeedDocker(platform=platform, internetMapEnabled=True),
-                str(output), override=override)
+    docker = ChainSeedDocker(platform=platform)
+    internet_map = InternetMap(emu, ".map.seed.emu")
+    internet_map.setPorts([8091, 8092, 8093])
+    docker.addContainerBundle(internet_map)
+    emu.compile(docker, str(output), override=override)
     return emu
 
 

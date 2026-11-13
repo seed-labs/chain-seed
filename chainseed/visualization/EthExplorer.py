@@ -20,6 +20,8 @@ POSTGRES_IMAGE = "postgres:15.2-alpine"
 REDIS_IMAGE = "redis:7-alpine"
 LITTLE_BIGTABLE_IMAGE = "gobitfly/little_bigtable:latest"
 
+EL_PORT = '8545'
+CL_PORT = "8000"
 SEEDEMU_ETH_EXPLORER_WEB_INTERNAL_PORT = 5000
 DOCKER_LOGGOING_CONFIG = {
     "driver": "json-file",
@@ -307,6 +309,8 @@ class EthExplorer(ContainerBundle):
                     "CL_HOST": self.__beacon_host,
                     "EL_HOST": self.__geth_host,
                     "POSTGRES_HOST": postgres_ip,
+                    "EL_PORT": EL_PORT,
+                    "CL_PORT": CL_PORT,
                 },
                 "build": f"./{ethexplorer_api_server.getHostname()}",
                 "logging": DOCKER_LOGGOING_CONFIG,
@@ -358,6 +362,8 @@ class EthExplorer(ContainerBundle):
                     "CL_HOST": self.__beacon_host,
                     "EL_HOST": self.__geth_host,
                     "POSTGRES_HOST": postgres_ip,
+                    "EL_PORT": EL_PORT,
+                    "CL_PORT": CL_PORT,
                 },
                 "ports": [
                     f"{self._ports.pop()}:{SEEDEMU_ETH_EXPLORER_WEB_INTERNAL_PORT}"

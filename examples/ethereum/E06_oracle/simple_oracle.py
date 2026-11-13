@@ -231,7 +231,15 @@ def run(
     output_dir.parent.mkdir(parents=True, exist_ok=True)
     docker = ChainSeedDocker(platform=platform)
     if ether_view_enabled:
-        docker.addContainerBundle(EthExplorer(emu, chain_name="pos"))
+        # Configure EthExplorer as a SeedEmu container bundle.
+        eth_explorer = EthExplorer(emu, ".eth.seed.emu")
+        eth_explorer.addInternalNetwork(
+            asn="150",
+            network_name="net0",
+            ip_addresses=["10.150.0.180", "10.150.0.181"],
+        )
+        eth_explorer.setPorts([8090])
+        docker.addContainerBundle(eth_explorer)
 
     emu.compile(docker, str(output_dir), override=override)
 

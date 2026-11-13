@@ -124,7 +124,7 @@ def test_native_docker_compiles_host_publication_runtime_and_readonly_mount(tmp_
     cwd = Path.cwd()
     output = tmp_path / 'output'
     try:
-        emu.compile(Docker(internetMapEnabled=False), str(output))
+        emu.compile(Docker(), str(output))
     finally:
         os.chdir(cwd)
     compose = yaml.safe_load((output / 'docker-compose.yml').read_text())

@@ -30,11 +30,12 @@ class PackageIntegrationTests(unittest.TestCase):
         emulator.addLayer(Routing())
         return emulator
 
-    def compile(self, emulator, compiler=None):
+    def compile(self, emulator, compiler=None, render=False):
         original_cwd = Path.cwd()
         with tempfile.TemporaryDirectory() as directory:
             try:
-                emulator.render()
+                if not render:
+                    emulator.render()
                 emulator.compile(compiler or ChainSeedDocker(), directory + "/output")
                 compose = yaml.safe_load(Path(directory, "output/docker-compose.yml").read_text())
                 dockerfiles = []
@@ -63,11 +64,20 @@ class PackageIntegrationTests(unittest.TestCase):
         chain.createVcNode("validator").enablePOSValidatorAtGenesis().connectToBeaconNode("beacon")
         chain.createBeaconSetupNode("setup")
         emulator.addLayer(service)
+        emulator.render()
         from chainseed.visualization import EthExplorer
         compiler = ChainSeedDocker()
-        compiler.addContainerBundle(EthExplorer(emulator, chain_name="pos"))
-        compose = self.compile(emulator, compiler)
-        self.assertIn("seedemu-ethexplorer-backend", compose["services"])
+        explorer = EthExplorer(emulator, ".eth.seed.emu")
+        explorer.addInternalNetwork(
+            asn="150",
+            network_name="net0",
+            ip_addresses=["10.150.0.180", "10.150.0.181"],
+        )
+        explorer.setPorts([8090])
+        compiler.addContainerBundle(explorer)
+        compose = self.compile(emulator, compiler, render=True)
+        print(compose["services"])
+        self.assertIn("ethexplorer-api-server.eth.seed.emu", compose["services"])
 
     def test_legacy_ethereum_and_custom_binary(self):
         for consensus in (ConsensusMechanism.POA, ConsensusMechanism.POW):

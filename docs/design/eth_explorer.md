@@ -106,10 +106,8 @@ At configuration time, EthExplorer gets the first blockchain from
 
 `setBeaconHost()` and `setGethHost()` set explicit host overrides before
 configuration. `getBeaconHost()` and `getGethHost()` return the selected values.
-The E02 script currently accepts `--explorer-geth` and `--explorer-beacon` CLI
-arguments for compatibility, but the current `run()` implementation does not
-pass those values to the bundle; the bundle uses boot-node addresses unless
-its setters are called directly.
+The E01 and E02 scripts use the bundle's boot-node defaults. To use other
+addresses, call the host setters directly before registering the bundle.
 
 ## Startup configuration
 

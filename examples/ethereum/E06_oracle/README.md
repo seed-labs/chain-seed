@@ -319,6 +319,10 @@ address:
 curl http://<utility-ip>:5000/contracts_info?name=oracle-contract
 ```
 
+For PoS runs, ChainSeed EthExplorer is enabled by default and can be
+disabled with `--no-eth-explorer`. Open it at `http://127.0.0.1:8090`.
+The bundle uses the Ethereum network in AS150 for its internal route.
+
 To verify that the Oracle contract exists on chain, query its bytecode
 through Geth JSON-RPC:
 

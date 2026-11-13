@@ -250,9 +250,15 @@ compiling the Docker output.
 ```python
 from chainseed.visualization import EthExplorer
 
-docker = ChainSeedDocker(internetMapEnabled=True, platform=platform)
+docker = ChainSeedDocker(platform=platform)
+internet_map = InternetMap(emu, ".map.seed.emu")
+internet_map.setPorts([8091, 8092, 8093])
+docker.addContainerBundle(internet_map)
 if ether_view_enabled:
-    docker.addContainerBundle(EthExplorer(emu, chain_name="pos"))
+    explorer = EthExplorer(emu, ".eth.seed.emu")
+    explorer.addInternalNetwork(asn="151", network_name="net0", ip_addresses=["10.151.0.16", "10.151.0.17"])
+    explorer.setPorts([8090])
+    docker.addContainerBundle(explorer)
 
 emu.compile(docker, output, override=True)
 ```
@@ -319,8 +325,9 @@ After the emulator starts, the following services are commonly used:
 
 | Service | Default URL | Function |
 | --- | --- | --- |
-| Internet Map | `http://127.0.0.1:8080/map.html` | Shows the emulated Internet topology |
-| Eth Explorer | `http://127.0.0.1:5000` | Shows the Ethereum PoS private chain |
+| Internet Map topology | `http://127.0.0.1:8092/` | Shows the emulated Internet topology |
+| Internet Map geography | `http://127.0.0.1:8093/` | Shows the geographic topology |
+| Eth Explorer | `http://127.0.0.1:8090` | Shows the Ethereum PoS private chain |
 | Geth HTTP RPC | `http://<geth-ip>:8545` | Allows tools and wallets to interact with the execution layer |
 | Beacon API | `http://<beacon-ip>:8000` | Allows tools to inspect consensus-layer state |
 

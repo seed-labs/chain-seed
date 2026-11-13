@@ -108,7 +108,7 @@ def compile_network(output: Path, nodes: int = 1200, stub_as_count: int | None =
         if str(host.getInterfaces()[0].getAddress()) != record["ip"]:
             raise ValueError(f'Network address differs from the deployment plan for monero-{record["index"]}')
     output.parent.mkdir(parents=True, exist_ok=True)
-    compiler = ChainSeedDocker(internetMapEnabled=False, platform=Platform.AMD64)
+    compiler = ChainSeedDocker(platform=Platform.AMD64)
     # The shared Monero image extends the SeedEmu base and contains its tools.
     if image not in {candidate.getName() for candidate, _ in compiler.getImages()}:
         compiler.addImage(DockerImage(name=image, software=[], subset=BASE_IMAGE))
