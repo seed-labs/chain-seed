@@ -32,10 +32,11 @@ if str(REPO_ROOT) not in sys.path:
 
 from examples.ethereum.E00_ethereum_poa import mini_internet
 
-from seedemu import Binding, Filter, Makers
+from seedemu import Binding, Filter
 from seedemu.compiler import Platform
 from chainseed.compiler import ChainSeedDocker
 from chainseed.services.solana import SolanaService
+from seedemu.containerBundle import InternetMap
 
 
 def _bind(emu, vnode: str, asn: int, host_index: int, display_name: str) -> None:
@@ -117,5 +118,8 @@ emu.render()
 
 ###############################################################################
 # Compile docker-compose and the build context into ./output.
-docker = ChainSeedDocker(internetMapEnabled=True, platform=platform)
+docker = ChainSeedDocker(platform=platform)
+internet_map = InternetMap(emu, ".map.seed.emu")
+internet_map.setPorts([8091, 8092, 8093])
+docker.addContainerBundle(internet_map)
 emu.compile(docker, str(EXAMPLE_DIR / "output"), override=True)

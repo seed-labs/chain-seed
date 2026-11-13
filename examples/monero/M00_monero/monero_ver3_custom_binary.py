@@ -20,6 +20,7 @@ import sys
 from seedemu import Binding, Filter, Makers
 from seedemu.compiler import Platform
 from chainseed.compiler import ChainSeedDocker
+from seedemu.containerBundle import InternetMap
 from chainseed.services.monero import MoneroBinarySource, MoneroMiningTrigger, MoneroService
 
 CUSTOM_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "custom")) # The directory containing your custom Monero binaries
@@ -124,7 +125,10 @@ _bind(emu, pruned_vnode, 164, host_index=0)
 emu.addLayer(monero)
 emu.render()
 
-docker = ChainSeedDocker(internetMapEnabled=True, platform=platform)
+docker = ChainSeedDocker( platform=platform)
+internet_map = InternetMap(emu, ".map.seed.emu")
+internet_map.setPorts([8091, 8092, 8093])
+docker.addContainerBundle(internet_map)
 emu.compile(docker, "./output", override=True)
 
 

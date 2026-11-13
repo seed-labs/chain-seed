@@ -235,7 +235,12 @@ webHost.appendStartCommand('serve -sC /volumes/kubo-dapp/build', fork=True)
 Following this, we simply compile as usual!
 
 ```python
-docker = Docker(internetMapEnabled=True, etherViewEnabled=True)
+from seedemu.containerBundle import InternetMap
+
+docker = Docker()
+internet_map = InternetMap(emu, ".map.seed.emu")
+internet_map.setPorts([8091, 8092, 8093])
+docker.addContainerBundle(internet_map)
 emu.compile(docker, OUTPUTDIR, override = True)
 ```
 

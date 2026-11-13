@@ -240,7 +240,7 @@ def run(output=SCRIPT_DIR / "output", beacons=100, stub_as_count=64,
             viewer.setObservationDirectory(lookingglass_run_dir)
         _bind(emu, "lookingglass", viewer_placement)
     emu.render()
-    compiler = ChainSeedDocker(platform=Platform.AMD64, internetMapEnabled=False)
+    compiler = ChainSeedDocker(platform=Platform.AMD64)
     if image:
         base = emu.getLayer("Base")
         for placement in placements.values():

@@ -147,12 +147,13 @@ webHost.appendStartCommand(f'python3 volumes/deployContract.py {getIP(emu.resolv
 webHost.appendStartCommand('cd /volumes/kubo-dapp/ && [ ! -d build ] && npm run build')
 webHost.appendStartCommand('serve -sC /volumes/kubo-dapp/build', fork=True)
 
-docker = ChainSeedDocker(internetMapEnabled=True, platform=platform)
-
+docker = ChainSeedDocker(platform=platform)
 # Use the "kubo-webhost-image" custom image from local
 docker.addImage(DockerImage('kubo-webhost-image', [], local = True), priority=-1)
 docker.setImageOverride(webHost, 'kubo-webhost-image')
-
+internet_map = InternetMap(emu, ".map.seed.emu")
+internet_map.setPorts([8091, 8092, 8093])
+docker.addContainerBundle(internet_map)
 emu.compile(docker, OUTPUTDIR, override = True)
 
 # Copy the base container image to the output folder

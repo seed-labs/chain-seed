@@ -91,7 +91,7 @@ def test_static_path_uses_actual_client_keys_and_ports(consensus, tmp_path):
     old_cwd = Path.cwd()
     try:
         output = tmp_path / 'output'
-        emu.compile(ChainSeedDocker(internetMapEnabled=False), str(output))
+        emu.compile(ChainSeedDocker(), str(output))
     finally:
         os.chdir(old_cwd)
     compose = yaml.safe_load((output / 'docker-compose.yml').read_text())

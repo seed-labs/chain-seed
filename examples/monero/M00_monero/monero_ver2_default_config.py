@@ -17,8 +17,9 @@ from examples.ethereum.E00_ethereum_poa import mini_internet
 import os
 import sys
 
-from seedemu import Binding, Filter, Makers
+from seedemu import Binding, Filter
 from seedemu.compiler import Platform
+from seedemu.containerBundle import InternetMap
 from chainseed.compiler import ChainSeedDocker
 from chainseed.services.monero import MoneroService, MoneroMiningTrigger
 
@@ -100,7 +101,10 @@ emu.addLayer(monero)
 emu.render()
 
 # Compile docker-compose and build context into ./output
-docker = ChainSeedDocker(internetMapEnabled=True, platform=platform)
+docker = ChainSeedDocker(platform=platform)
+internet_map = InternetMap(emu, ".map.seed.emu")
+internet_map.setPorts([8091, 8092, 8093])
+docker.addContainerBundle(internet_map)
 emu.compile(docker, "./output", override=True)
 
 

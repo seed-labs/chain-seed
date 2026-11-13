@@ -30,8 +30,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--platform", choices=["amd", "arm"])
     parser.add_argument("--output", default=str(SCRIPT_DIR / "output"))
     parser.add_argument("--dumpfile")
-    parser.add_argument("--explorer-geth", help="Geth virtual node for EthExplorer (for example gethnode1)")
-    parser.add_argument("--explorer-beacon", help="Beacon virtual node for EthExplorer (for example beaconnode1)")
     parser.add_argument(
         "--beacon-nodes",
         type=int,
@@ -68,8 +66,6 @@ def parse_args() -> argparse.Namespace:
         parser.error("--beacon-nodes must be >= 1")
     if args.validators_per_beacon < 1:
         parser.error("--validators-per-beacon must be >= 1")
-    if not args.ether_view_enabled and (args.explorer_geth or args.explorer_beacon):
-        parser.error("--explorer-geth/--explorer-beacon require --eth-explorer")
     return args
 
 
@@ -192,12 +188,8 @@ def run(
     platform=Platform.AMD64,
     override: bool = True,
     render: bool = True,
-    explorer_geth_vnode: str | None = None,
-    explorer_beacon_vnode: str | None = None,
     ether_view_enabled: bool = True,
 ):
-    if not ether_view_enabled and (explorer_geth_vnode is not None or explorer_beacon_vnode is not None):
-        raise ValueError("Explorer target selection requires ether_view_enabled=True")
     emu = build_emulator(total_beacon_nodes=total_beacon_nodes, vc_per_beacon=vc_per_beacon)
     if dumpfile is not None:
         emu.dump(dumpfile)
@@ -208,10 +200,19 @@ def run(
 
     output_dir = Path(output or SCRIPT_DIR / "output").resolve()
     output_dir.parent.mkdir(parents=True, exist_ok=True)
-    docker = ChainSeedDocker(internetMapEnabled=True, platform=platform)
+    docker = ChainSeedDocker(platform=platform)
+    internet_map = InternetMap(emu, ".map.seed.emu")
+    internet_map.setPorts([8091, 8092, 8093])
+    docker.addContainerBundle(internet_map)
     if ether_view_enabled:
-        docker.addContainerBundle(EthExplorer(emu, chain_name="pos",
-            geth_vnode=explorer_geth_vnode, beacon_vnode=explorer_beacon_vnode))
+        # Create the explorer bundle; keep the suffix lowercase for Docker image names.
+        eth_explorer = EthExplorer(emu,".eth.seed.emu")
+        # Connect to net0 in AS151 with two addresses for accessing emulated Ethereum nodes.
+        eth_explorer.addInternalNetwork(asn="151", network_name="net0", ip_addresses=["10.151.0.16", "10.151.0.17"])
+        # Expose the explorer web service on host port 8090.
+        eth_explorer.setPorts([8090])
+        # Register the bundle with the Docker compiler to generate its deployment configuration.
+        docker.addContainerBundle(eth_explorer)
 
     emu.compile(docker, str(output_dir), override=override)
 
@@ -226,8 +227,6 @@ def main() -> int:
         platform=resolve_platform(args.platform),
         override=args.override,
         render=args.render,
-        explorer_geth_vnode=args.explorer_geth,
-        explorer_beacon_vnode=args.explorer_beacon,
         ether_view_enabled=args.ether_view_enabled,
     )
     return 0
