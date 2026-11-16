@@ -82,7 +82,7 @@ runtime:
         - redis
         - littlebigtable
         - rawbigtable
-        - seedemu-ethexplorer-backend
+        - ethexplorer-api-server
         - seedemu-ethexplorer-web
       retries: 90
       interval: 5
@@ -90,7 +90,7 @@ runtime:
 
     - name: E02 EthExplorer homepage is ready
       type: http
-      url: http://127.0.0.1:5000/
+      url: http://127.0.0.1:8090/
       retries: 90
       interval: 5
       timeout: 10
@@ -147,14 +147,14 @@ probes:
 
   - name: E02 EthExplorer API docs are reachable
     type: http
-    url: http://127.0.0.1:5000/api/v1/docs
+    url: http://127.0.0.1:8090/api/v1/docs
     retries: 30
     interval: 5
     timeout: 10
 
   - name: E02 EthExplorer latest-state API is reachable
     type: http
-    url: http://127.0.0.1:5000/api/v1/latestState
+    url: http://127.0.0.1:8090/api/v1/latestState
     expect_body_regex: "(?i)(slot|epoch|head|finalized)"
     retries: 90
     interval: 5

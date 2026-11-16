@@ -4,6 +4,7 @@
 from seedemu.core import Emulator, Binding, Filter
 from seedemu.mergers import DEFAULT_MERGERS
 from seedemu.compiler import Docker
+from seedemu.containerBundle import InternetMap
 
 emuA = Emulator()
 emuB = Emulator()
@@ -23,7 +24,10 @@ emu.addBinding(Binding('eth6', filter = Filter(asn = 170)))
 
 # Render and compile
 emu.render()
-
+docker = Docker()
+internet_map = InternetMap(emu, ".map.seed.emu")
+internet_map.setPorts([8091, 8092, 8093])
+docker.addContainerBundle(internet_map)
 # If output directory exists and override is set to false, we call exit(1)
 # updateOutputdirectory will not be called
-emu.compile(Docker(internetMapEnabled=True), './output')
+emu.compile(docker, './output')

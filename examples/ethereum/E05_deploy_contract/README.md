@@ -311,6 +311,8 @@ stored on chain.
 For PoS runs, ChainSeed EthExplorer is enabled by default and can be
 disabled with `--no-eth-explorer`. PoA runs do not enable it because the
 Beacon consensus endpoint required by EthExplorer is not present.
+When enabled, open the explorer at `http://127.0.0.1:8090`. The bundle uses
+the Ethereum network in AS150 for its internal route.
 
 
 ## Interact with the Utility Server Using Python

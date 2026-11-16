@@ -23,9 +23,9 @@ chainseed-test test examples/ethereum/E03_lookingglass/example.yaml --artifact-d
 chainseed-test down examples/ethereum/E03_lookingglass/example.yaml
 ```
 
-Open http://127.0.0.1:8765. The Internet Map is at
-http://127.0.0.1:8080/map.html. `all` stops the deployment when testing finishes;
-use the separate steps to browse it. Stop other examples using ports 8080/8765
+Open http://127.0.0.1:8765. Internet Map topology and geography are at
+http://127.0.0.1:8092/ and http://127.0.0.1:8093/. `all` stops the deployment when testing finishes;
+use the separate steps to browse it. Stop other examples using ports 8091–8093/8765
 or overlapping emulated networks before starting E03.
 
 The runtime test checks host access and web assets, the complete client inventory

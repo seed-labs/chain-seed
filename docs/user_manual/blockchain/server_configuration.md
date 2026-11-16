@@ -88,20 +88,24 @@ command. A custom `--cache` or `--rpc.txfeecap` conflicts with the corresponding
 explicit Server API and is rejected during rendering.
 
 
-To attach EthExplorer to a particular observation node, use its virtual node name:
+EthExplorer selects the chain's boot Geth and Beacon nodes automatically. To
+override the host addresses directly, use its host setters:
 
 ```python
 from chainseed.visualization import EthExplorer
 
-explorer = EthExplorer(emu, chain_name="pos",
-                       geth_vnode="geth-0", beacon_vnode="beacon-0")
+explorer = EthExplorer(emu, ".eth.seed.emu")
+explorer.setGethHost("10.150.0.71")
+explorer.setBeaconHost("10.150.0.72")
+explorer.addInternalNetwork(
+    asn="150", network_name="net0",
+    ip_addresses=["10.150.0.180", "10.150.0.181"],
+)
+explorer.setPorts([8090])
 docker.addContainerBundle(explorer)
 ```
 
-The selected Geth must call `enableGethHttp()` and the selected Beacon must retain
-`setReconstructHistoricStates(True)`. Both must belong to the requested chain.
-Without selectors the bundle chooses eligible nodes automatically. The
-configured Geth HTTP RPC port is forwarded to both Explorer services.
+The configured Geth HTTP RPC port is forwarded to both Explorer services.
 See the [E02 manual](../../../examples/ethereum/E02_eth_explorer/README.md).
 
 

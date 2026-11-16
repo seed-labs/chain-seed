@@ -222,7 +222,7 @@ def main() -> int:
         emu.render()
         output_dir = Path(args.output or SCRIPT_DIR / f"output_tp{args.target_peers}").resolve()
         emu.compile(
-            Docker(internetMapEnabled=False, platform=(Platform.AMD64 if args.platform == "amd" else Platform.ARM64)),
+            Docker(platform=(Platform.AMD64 if args.platform == "amd" else Platform.ARM64)),
             str(output_dir),
             override=True,
         )
