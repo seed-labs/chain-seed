@@ -14,7 +14,7 @@ authors = [
 ]
 dependencies = [
   "PyYAML>=6.0,<7",
-  "seedemu>=1.0.0,<2.0.0",
+  "seedemu==0.0.7",
   "eth-account==0.5.9",
   "eth-keys>=0.3.4,<0.4",
   "requests>=2.22",

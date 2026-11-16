@@ -4,8 +4,8 @@
 
 ## 实现状态
 
-ChainSeed 1.0.0 依赖 SeedEmu 1.0.0（`seedemu>=1.0.0,<2.0.0`）。
-SeedEmu 的 `release` 分支包含网络仿真器和通用扩展接口；区块链实现、镜像和测试
+ChainSeed 1.0.0 暂时要求 SeedEmu 0.0.7（`seedemu==0.0.7`）。
+SeedEmu 的 `development` 分支包含网络仿真器和通用扩展接口；区块链实现、镜像和测试
 由 ChainSeed 提供。两个发行包均支持普通 wheel 安装，导入时还会检查所需的
 `SystemProfile` 和 Docker 接口。共享网络定义位于 E00 的 `mini_internet.py`，
 支持未 render 的网络 bin 导出。

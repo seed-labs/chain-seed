@@ -4,8 +4,8 @@
 
 ## Implementation status
 
-ChainSeed 1.0.0 depends on SeedEmu 1.0.0 (`seedemu>=1.0.0,<2.0.0`).
-The SeedEmu `release` branch contains the network emulator and generic extension
+ChainSeed 1.0.0 currently requires SeedEmu 0.0.7 (`seedemu==0.0.7`).
+The SeedEmu `development` branch contains the network emulator and generic extension
 interfaces; blockchain implementations, images, and tests belong to ChainSeed.
 Both distributions support ordinary wheel installation. Imports additionally
 check the required `SystemProfile` and Docker hooks. Network definitions are

@@ -19,7 +19,7 @@ descriptor = ChainSeedExtension(
     distribution="chainseed",
     version="1.0.0",
     extension_api_version=1,
-    seedemu_min_version="1.0.0",
+    seedemu_min_version="0.0.7",
     owned_layer_names=(
         "EthereumService",
         "MoneroService",
@@ -46,7 +46,7 @@ def check_seedemu_compatibility() -> None:
     if missing:
         raise RuntimeError(
             "chainseed is missing required SeedEmu capabilities: " + ", ".join(missing) + "; "
-            "install seedemu>=1.0.0,<2.0.0. The distribution "
+            "install seedemu==0.0.7 with these extension interfaces. The distribution "
             "version alone does not identify these capabilities."
         )
 
