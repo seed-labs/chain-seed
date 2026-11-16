@@ -30,17 +30,17 @@ Explorer is provided by `chainseed.visualization.EthExplorer` and registered
 through SeedEmu's public Docker interface:
 
 ```python
-from chainseed import ChainSeedDocker
+from seedemu.compiler import Docker
 from chainseed.visualization import EthExplorer
 
 emu.render()
-docker = ChainSeedDocker(internetMapEnabled=True)
+docker = Docker(internetMapEnabled=True)
 docker.addContainerBundle(EthExplorer(emu, chain_name="pos", port=5000))
 emu.compile(docker, "output")
 ```
 
-`ChainSeedDocker` currently supplies the blockchain image mappings. The Explorer
-bundle itself uses the same `addContainerBundle()` interface on SeedEmu `Docker`.
+EthereumService supplies the blockchain image mappings to native SeedEmu Docker.
+The Explorer bundle uses its `addContainerBundle()` interface.
 Its seven containers are ClickHouse, PostgreSQL, Redis, two Bigtable instances,
 and the Explorer backend and web application. Image recipes are in
 [`docker_images/ethexplorer`](../../../docker_images/ethexplorer/).

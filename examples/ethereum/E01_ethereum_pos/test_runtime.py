@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from chainseed.common.systems import ETHEREUM_POS
-from chainseed.compiler.images import IMAGE_CATALOG
+from chainseed.services.ethereum import EthereumService
 from seedemu.compiler import Platform
 from chainseed.testing import EthereumRuntimeTest
 
@@ -11,7 +11,7 @@ from chainseed.testing import EthereumRuntimeTest
 def main() -> int:
     test = EthereumRuntimeTest(__file__)
 
-    expected_from = "FROM " + IMAGE_CATALOG[Platform.AMD64][ETHEREUM_POS].getName()
+    expected_from = "FROM " + EthereumService().getDockerImages(Platform.AMD64)[ETHEREUM_POS].getName()
     dummy_dir = test.example_dir / "output" / "dummies"
     generated_from = {
         path.read_text(encoding="utf-8").strip()

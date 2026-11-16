@@ -34,7 +34,7 @@ from examples.ethereum.E00_ethereum_poa import mini_internet
 
 from seedemu import Binding, Filter, Makers
 from seedemu.compiler import Platform
-from chainseed.compiler import ChainSeedDocker
+from seedemu.compiler import Docker
 from chainseed.services.solana import SolanaService
 
 
@@ -117,5 +117,5 @@ emu.render()
 
 ###############################################################################
 # Compile docker-compose and the build context into ./output.
-docker = ChainSeedDocker(internetMapEnabled=True, platform=platform)
+docker = Docker(internetMapEnabled=True, platform=platform)
 emu.compile(docker, str(EXAMPLE_DIR / "output"), override=True)

@@ -16,7 +16,7 @@ if str(REPO_ROOT) not in sys.path:
 from examples.ethereum.E00_ethereum_poa import mini_internet
 
 from seedemu import *
-from chainseed.compiler import ChainSeedDocker
+from seedemu.compiler import Docker
 from chainseed.visualization import EthExplorer
 from chainseed.services.ethereum import *
 
@@ -208,7 +208,7 @@ def run(
 
     output_dir = Path(output or SCRIPT_DIR / "output").resolve()
     output_dir.parent.mkdir(parents=True, exist_ok=True)
-    docker = ChainSeedDocker(internetMapEnabled=True, platform=platform)
+    docker = Docker(internetMapEnabled=True, platform=platform)
     if ether_view_enabled:
         docker.addContainerBundle(EthExplorer(emu, chain_name="pos",
             geth_vnode=explorer_geth_vnode, beacon_vnode=explorer_beacon_vnode))

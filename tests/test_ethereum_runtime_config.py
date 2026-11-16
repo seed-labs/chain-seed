@@ -9,7 +9,7 @@ import sys
 import pytest
 import yaml
 
-from chainseed import ChainSeedDocker
+from seedemu.compiler import Docker
 from chainseed.services.ethereum import ConsensusMechanism, EthereumService
 from seedemu.core import Action, Binding, Emulator, Filter
 from seedemu.layers import Base, Routing
@@ -130,7 +130,7 @@ def test_distinct_clients_reach_compiled_scripts_and_processes(network, tmp_path
     old_cwd = Path.cwd()
     try:
         output = tmp_path / 'output'
-        compiler = ChainSeedDocker(internetMapEnabled=False)
+        compiler = Docker(internetMapEnabled=False)
         emu.compile(compiler, str(output))
     finally:
         os.chdir(old_cwd)

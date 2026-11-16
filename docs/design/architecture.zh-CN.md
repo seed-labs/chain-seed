@@ -76,7 +76,6 @@ chain-seed/
 ├── chainseed/
 │   ├── extension.py
 │   ├── common/
-│   ├── compiler/
 │   ├── services/
 │   │   ├── ethereum/
 │   │   │   └── LookingglassServer/
@@ -126,8 +125,7 @@ chain-seed/
 | `extension` | ChainSeed 版本、SeedEmu API 要求、层名称和模式版本 |
 | `common.artifacts` | Genesis、账户、端点和发布清单的类型化传递 |
 | `common.systems` | 与编译器无关的运行系统 profile |
-| `compiler.images` | 各目标平台的 OCI 镜像映射 |
-| `compiler.ChainSeedDocker` | ChainSeed 镜像选择与 Monero 覆盖 |
+| `services/<chain>/*Service` | Service 自有的各平台 Docker 镜像映射 |
 | `common.labels` | 节点发现与可观测性的版本化标签 |
 | `common.runtime` | 通用进程启动和就绪声明 |
 | `ethereum.service` | PoW、PoA、PoS 网络生命周期和虚拟角色绑定 |
@@ -195,18 +193,17 @@ ChainSeed 只依赖一组较小的公共接口，不依赖编译器内部实现�
 | 网络模型 | AS/网络查询、地址、接口、绑定和过滤 |
 | 制品交换 | 注册生成文件并提供给依赖服务 |
 | 运行系统选择 | 通过 `Node.setBaseSystem` 保存 ChainSeed 自有 `SystemProfile` |
-| Docker 扩展 | 镜像目录钩子与公开的 `addContainerBundle()` |
+| Docker 扩展 | Service 镜像声明与公开的 `addContainerBundle()` |
 | 运行时测试 | 容器列表、标签、命名空间、命令和探针 |
 | 扩展元数据 | 名称、版本、SeedEmu API 版本和层名称 |
 
-区块链服务不构造 `DockerImage`，只保存逻辑运行 profile。
-`ChainSeedDocker` 是编译器侧适配器，负责镜像对象、平台映射以及可选的
-单次部署覆盖。
+Server 保存通用的 `SystemProfile` 别名；各 Service 的 `getDockerImages(platform)`
+返回该后端所需的 `DockerImage` 声明。SeedEmu 原生 Docker 在编译前收集并验证这些映射，
+再根据节点 Profile 选择基础镜像。同一 Profile 或镜像名的冲突声明会报错。
+Monero 自定义镜像也通过 Profile 和 Service 映射处理。
 
-`ChainSeedDocker` 通过 `_getSystemImageCatalog()` 扩展镜像目录。
 EthExplorer 位于 `visualization/`，继承 `ContainerBundle`，通过
-`Docker.addContainerBundle()` 接入容器编译流程。Explorer 不再使用编译器子类
-的附加 Compose 服务钩子。
+`Docker.addContainerBundle()` 接入容器编译流程，无需编译器子类。
 
 公共导入方式必须显式：
 

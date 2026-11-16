@@ -253,7 +253,7 @@ Notes:
 ## Design notes (alignment with PRINCIPLES.md)
 
 - **P1 (execution-agnostic):** the service and topology declarations contain no
-  Docker image names; `emu.compile(ChainSeedDocker(), ...)` selects the
+  Docker image names; `emu.compile(Docker(), ...)` selects the
   ChainSeed-aware backend.
 - **P4 (virtual nodes + late binding):** validators are symbolic vnodes; their
   IPs and the bootstrap entrypoint are resolved from `Binding`s during

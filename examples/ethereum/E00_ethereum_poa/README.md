@@ -1,119 +1,141 @@
-# Ethereum Blockchain (POA)
+# Ethereum Blockchain (PoA)
+
+This example deploys a private Ethereum proof-of-authority (PoA) network using
+Geth. It demonstrates how to configure pre-funded accounts and signer nodes,
+bind blockchain services to hosts in an emulated network, and generate Docker
+deployment files.
+
+`component_poa.py` configures the blockchain; `ethereum_poa.py` combines it with
+the network from `mini_internet.py` and generates the Docker deployment.
 
 ## Create a blockchain
 
-To create a blockchain, we first create the `EthereumService`, and then
-create a blockchain inside this service. The service supports
-multiple chains.  
+Create an `EthereumService`, then use `createBlockchain()` to add a PoA
+blockchain. A single service can manage multiple blockchains.
 
 ```python
+from chainseed.services.ethereum import EthereumService, ConsensusMechanism
+
 eth = EthereumService()
-blockchain = eth.createBlockchain(chainName="POA", consensus=ConsensusMechanism.POA)
+blockchain = eth.createBlockchain(
+    chainName="POA",
+    consensus=ConsensusMechanism.POA,
+)
 ```
 
-## Create pre-funded accounts (add to the genesis block)
+## Configure pre-funded accounts
 
-Each Ethereum node will have at least one accounts on it, and more
-can be created. The system use a set of default values to create
-and configure these accounts. Users can replace these default
-values with their own values. 
+Before creating Ethereum nodes, configure the accounts generated for each node.
+This example creates two accounts per node, each with an initial balance of
+1,000 ETH.
 
 ```python
-mnemonic, _, _= blockchain.getEmuAccountParameters()
-blockchain.setEmuAccountParameters(mnemonic=mnemonic, balance=1000, \
-        total_per_node = total_accounts_per_node)
+mnemonic, _, _ = blockchain.getEmuAccountParameters()
+blockchain.setEmuAccountParameters(
+    mnemonic=mnemonic,
+    balance=1000,
+    total_per_node=2,
+)
 ```
 
-Users can also add arbitrary pre-funded account to the blockchain.
+You can also allocate an initial balance to an existing address without importing
+its private key into the emulator:
 
 ```python
-blockchain.addLocalAccount(address='0xF5406927254d2dA7F7c28A61191e3Ff1f2400fe9',
-                           balance=30)
+blockchain.addLocalAccount(
+    address="0xF5406927254d2dA7F7c28A61191e3Ff1f2400fe9",
+    balance=30,
+)
 ```
 
-All the accounts created during the build time will be added (along with their
-balance) to the genesis block. Therefore, their balances are recognized. 
-
-For detailed account management instructions, see
-[this manual](../../../docs/user_manual/blockchain/accounts.md)
-
+These balances are recorded in the genesis state and are available when the
+chain starts. See the
+[account management guide](../../../docs/user_manual/blockchain/accounts.md)
+for more configuration options.
 
 ## Create Ethereum Nodes
 
-To create an Ethereum node, we just need to provide a node name (virtual node),
-and use the following API. 
+By default, the example creates 20 Ethereum nodes. Even-indexed nodes are
+signers, and nodes whose indices are divisible by three are bootnodes.
+
+Create an Ethereum node with a unique virtual node name, then configure the
+returned Server instance. The following node acts as both a PoA signer and a
+bootnode, with HTTP and WebSocket RPC enabled:
 
 ```python
-e = blockchain.createNode('node0')
+eth_node = blockchain.createNode("eth0")
+eth_node.startMiner()
+eth_node.setBootNode(True)
+eth_node.enableGethHttp()
+eth_node.enableGethWs()
 ```
 
-Each node can be configured and customized using the provided APIs. See the
+For PoA, `startMiner()` enables block signing. `setBootNode(True)` makes the node
+a bootstrap peer for node discovery. See
 [`EthereumServer`](../../../chainseed/services/ethereum/EthereumServer.py)
-class for the supported APIs.
+for additional configuration APIs.
 
+## Customize Geth
 
+Configure additional Geth command-line options or use a custom binary before
+calling `emu.render()`. These settings apply to the selected Server instance.
 
-## Other useful APIs
-
-These APIs are not used in this example, but they might be useful
-to satisfy additional emulation needs.
-
-- Set custom `geth` command option: for commonly-used options, we already
-  have APIs to set them. However, for options not covered by these APIs,
-  users can use this generic API to set them. 
-  ```python
-  eth_node.setCustomGethCommandOption("--http --http.addr 0.0.0.0")
-  ```
-
-- Use custom `geth` binary file: some users want to run a modified version
-  of the `geth` software on a particular node. They can do this
-  using the following API.
-  ```python
-  eth_node.setCustomGeth("./custom_geth_binary")
-  ```
-
-
-## Create Faucet and Information Servers
-
-In this example, we also create a faucet server and a utility server.
-These two servers are not used in this example, but they are used 
-by other examples. Because many applications require these 
-two servers, they are two essential elements in the SEED 
-blockchain emulator. 
-
-These two servers are not used in this example. The faucet 
-server is used in the example [E04_faucet](../E04_faucet), while the
-utility server is used in the example
-[E05_deploy_contract](../E05_deploy_contract) to help deploy
-smart contracts. 
-
-
-## Binding to Physical Nodes
-
-All the virtual nodes need to be bound to physical nodes. We have
-implemented an API called `getAllServerNames` to make it easy to 
-get all the server names, including the ethereum nodes, the faucet
-nodes, and the init-and-info servers. 
+Use `setCustomGethCommandOption()` for options not exposed by the Server APIs:
 
 ```python
-for _, servers in blockchain.getAllServerNames().items():
-    for server in servers:
-       emu.addBinding(Binding(server))
+eth_node.setCustomGethCommandOption("--txpool.globalslots 8192")
 ```
 
-In our example, we did not set any filter in the binding, so the binding
-will be random, i.e., each virtual node will be randomly bound to
-a physical node. 
+Use `setCustomGeth()` to include a local Geth binary in the node image. The binary
+must support Clique PoA and match the target architecture.
 
+```python
+eth_node.setCustomGeth("./custom_geth_binary")
+```
 
-## Supported platforms 
+## Faucet and Utility servers
 
-As of 5/25/2024, SEED Emulation Ethereum layer supports AMD platforms and
-partially supports ARM platforms. Please see details below.
+This example also includes Faucet and Utility servers. For configuration and
+usage, see [E04_faucet](../E04_faucet) and
+[E05_deploy_contract](../E05_deploy_contract). Both examples support PoA and PoS.
 
-| Ethereum Consensus | AMD | ARM |
-| ------------------ | --- | --- |
-| PoW                |  O  |  X  |
-| PoA                |  O  |  O  |
-| PoS                |  O  |  O  |
+## Bind services to network hosts
 
+Bind each virtual Server to a host in the emulated network.
+`getAllServerNames()` returns the names of the Ethereum nodes, Faucet, and
+Utility servers. This example applies a node-name filter and uses `Action.FIRST`
+to select the first eligible host that has not already been bound.
+
+```python
+from seedemu.core import Action, Binding, Filter
+
+for servers in blockchain.getAllServerNames().values():
+    for vnode in servers:
+        emu.addBinding(
+            Binding(
+                vnode,
+                filter=Filter(nodeName="host_*"),
+                action=Action.FIRST,
+            )
+        )
+```
+
+## How to run
+
+From the repository root, generate the deployment files, then build and start
+the containers:
+
+```bash
+cd examples/ethereum/E00_ethereum_poa
+python ethereum_poa.py
+cd output
+docker compose build
+docker compose up -d
+```
+
+The script defaults to AMD64. To select ARM64, run `python ethereum_poa.py arm`
+instead. Stop the emulation from the `output` directory with:
+
+```bash
+docker compose down
+```

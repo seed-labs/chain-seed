@@ -12,7 +12,7 @@ examples/<protocol>/<prefix><number>_<name>/
 ```
 
 The configuration script renders the emulator and compiles it with
-`ChainSeedDocker`. Its generated `output/` should be ready for Docker Compose.
+`Docker`. Its generated `output/` should be ready for Docker Compose.
 For large deployments, add separate batching scripts for startup and shutdown.
 The three large-scale examples live under
 `examples/ethereum/E10_large_scale/`, `examples/monero/M01_large_scale/`

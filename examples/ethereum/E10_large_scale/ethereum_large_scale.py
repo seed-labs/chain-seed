@@ -17,7 +17,7 @@ from _deployment import prepare_output
 from seedemu.core import Emulator, Binding, Filter, Action
 from seedemu.layers import EtcHosts
 from seedemu.compiler import Platform
-from chainseed import ChainSeedDocker
+from seedemu.compiler import Docker
 from chainseed.services.ethereum import (EthereumService, ConsensusMechanism,
     PoSBeaconSetupServer, PoSGethServer, PoSBeaconServer, PoSVcServer)
 
@@ -240,7 +240,7 @@ def run(output=SCRIPT_DIR / "output", beacons=100, stub_as_count=64,
             viewer.setObservationDirectory(lookingglass_run_dir)
         _bind(emu, "lookingglass", viewer_placement)
     emu.render()
-    compiler = ChainSeedDocker(platform=Platform.AMD64, internetMapEnabled=False)
+    compiler = Docker(platform=Platform.AMD64, internetMapEnabled=False)
     if image:
         base = emu.getLayer("Base")
         for placement in placements.values():

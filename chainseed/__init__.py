@@ -4,9 +4,7 @@ from .extension import ChainSeedExtension, check_seedemu_compatibility, descript
 
 check_seedemu_compatibility()
 
-from .compiler import ChainSeedDocker
-
 __version__ = descriptor.version
 
-__all__ = ["ChainSeedDocker", "ChainSeedExtension", "descriptor", "__version__"]
+__all__ = ["ChainSeedExtension", "descriptor", "__version__"]
 

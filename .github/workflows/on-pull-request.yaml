@@ -13,7 +13,7 @@ on:
         description: "SeedEmu revision from seed-labs/seed-emulator"
         type: string
         required: true
-        default: development
+        default: release
       selected-example:
         description: "Run one selected example, or all"
         type: choice
@@ -39,7 +39,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SEEDEMU_REF: ${{ github.event.inputs['seedemu-ref'] || 'development' }}
+  SEEDEMU_REF: ${{ github.event.inputs['seedemu-ref'] || 'release' }}
   SELECTED_EXAMPLE: ${{ github.event.inputs['selected-example'] || 'all' }}
   RUN_FULL_LIFECYCLE: ${{ github.event.inputs['run-full-lifecycle'] || 'false' }}
 
@@ -74,22 +74,22 @@ jobs:
             seed-emulator/**/*requirements.txt
             chain-seed/pyproject.toml
 
-      - name: Build ChainSEED wheel
+      - name: Build release wheels
         run: |
-          pip install build
+          python -m pip install build
+          python -m build --wheel ../seed-emulator --outdir ../wheels
           python -m build --wheel . --outdir ../wheels
 
       - name: Check installed ChainSEED wheel and copied examples
         run: |
-          pip install -e ../seed-emulator
-          pip install ../wheels/chainseed-*.whl
+          python -m pip install ../wheels/seedemu-*.whl ../wheels/chainseed-*.whl
           pip check
           python -I tests/installed_package_smoke.py --examples examples
 
-      - name: Install coordinated workspaces
+      - name: Install release packages
         run: |
-          pip install -e ../seed-emulator
-          pip install ".[dev]"
+          python -m pip install ../seed-emulator
+          python -m pip install ".[dev]"
 
       - name: Check repository ownership
         run: python tests/check_repository_boundaries.py --seedemu ../seed-emulator
@@ -159,10 +159,10 @@ jobs:
             seed-emulator/**/*requirements.txt
             chain-seed/pyproject.toml
 
-      - name: Install coordinated workspaces
+      - name: Install release packages
         run: |
-          pip install -e ../seed-emulator
-          pip install ".[dev]"
+          python -m pip install ../seed-emulator
+          python -m pip install ".[dev]"
 
       - name: Compile selected example
         if: ${{ env.SELECTED_EXAMPLE == 'all' || env.SELECTED_EXAMPLE == matrix.example.code }}
@@ -228,10 +228,16 @@ jobs:
             seed-emulator/**/*requirements.txt
             chain-seed/pyproject.toml
 
-      - name: Install coordinated workspaces
+      - name: Install release packages
         run: |
-          pip install -e ../seed-emulator
-          pip install ".[dev]"
+          python -m pip install ../seed-emulator
+          python -m pip install ".[dev]"
+
+      - name: Configure bridge forwarding for emulated networks
+        if: ${{ env.RUN_FULL_LIFECYCLE == 'true' && (env.SELECTED_EXAMPLE == 'all' || env.SELECTED_EXAMPLE == matrix.example.code) }}
+        run: |
+          sudo modprobe br_netfilter
+          sudo sysctl -w net.bridge.bridge-nf-call-iptables=0
 
       - name: Run selected example lifecycle
         if: ${{ env.RUN_FULL_LIFECYCLE == 'true' && (env.SELECTED_EXAMPLE == 'all' || env.SELECTED_EXAMPLE == matrix.example.code) }}

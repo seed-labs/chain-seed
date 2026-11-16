@@ -4,6 +4,7 @@ import os
 from typing import Dict, Iterator, List, Optional, Tuple
 
 from seedemu.core.Emulator import Emulator
+from seedemu.core import BaseSystem, SystemProfile
 from seedemu.core.Node import Node
 from seedemu.core.Service import Server, Service
 from seedemu.core.enums import NetworkType
@@ -36,6 +37,30 @@ class MoneroService(Service):
     Blockchain- and node-specific logic is delegated to :class:`MoneroNetwork`
     to keep the semantics clean.
     """
+
+    def getDockerImages(self, platform):
+        """Declare this Service's Docker images for the target architecture."""
+        from seedemu.compiler import BASE_IMAGE, BASE_IMAGE_ARM64, DockerImage, Platform
+        from ...common.systems import MONERO
+
+        if platform not in (Platform.AMD64, Platform.ARM64):
+            raise ValueError(f"Unsupported Docker platform: {platform!r}")
+        base = BASE_IMAGE if platform == Platform.AMD64 else BASE_IMAGE_ARM64
+        images = {
+            MONERO: DockerImage(
+                name='handsonsecurity/seedemu-monero:latest',
+                software=[],
+                subset=base,
+            ),
+        }
+
+        for network in self.__networks.values():
+            if network.getCustomBaseImage():
+                images[network.getSystemProfile()] = DockerImage(
+                    name=network.getCustomBaseImage(), software=[],
+                )
+        images.update(super().getDockerImages(platform))
+        return images
 
     def __init__(self):
         super().__init__()
@@ -222,8 +247,15 @@ class MoneroNetwork:
         return self
 
     def getCustomBaseImage(self) -> Optional[str]:
-        """Return the optional compiler image override for this network."""
+        """Return the optional default Docker image for this network."""
         return self._defaults.custom_base_image
+
+    def getSystemProfile(self) -> SystemProfile:
+        """Return the network default; individual Servers can choose another profile."""
+        image = self.getCustomBaseImage()
+        if image:
+            return SystemProfile("chainseed.monero.custom:" + image, subset=MONERO)
+        return MONERO
 
     def setCustomBaseImage(self, image_name: str) -> "MoneroNetwork":
         """Set a custom base Docker image for all Monero nodes in this network.
@@ -249,9 +281,13 @@ class MoneroNetwork:
             >>> emu.render()
             >>> emu.compile(docker, './output')
         """
+        if not isinstance(image_name, str) or not image_name.strip():
+            raise ValueError("image_name must be a non-empty Docker image name")
+        previous = self.getSystemProfile()
         self._defaults.custom_base_image = image_name
         for server in self._nodes.values():
-            server.setBaseSystem(MONERO)
+            if server.getBaseSystem() in (previous, BaseSystem.DEFAULT):
+                server.setBaseSystem(self.getSystemProfile())
         return self
 
     def setDefaultWalletTemplate(self, spec: MoneroWalletSpec) -> "MoneroNetwork":

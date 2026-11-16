@@ -9,7 +9,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from seedemu import *
-from chainseed.compiler import ChainSeedDocker
+from seedemu.compiler import Docker
 from chainseed.services.ethereum import *
 from chainseed.services.chainlink import *
 from chainseed.services.chainlink.ChainlinkTemplates import *
@@ -85,7 +85,7 @@ def run(dumpfile = None, total_chainlink_nodes = 3):
     else:
         emu.render()
 
-        docker = ChainSeedDocker(platform=platform)
+        docker = Docker(platform=platform)
         emu.compile(docker, './output', override = True)
 
     print("-----------------------------------------")

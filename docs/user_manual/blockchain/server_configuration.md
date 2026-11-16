@@ -160,3 +160,38 @@ Custom Geth flags that override managed node keys, config files, port 30303 or a
 explicit maxpeers value are rejected rather than silently changing planned peers.
 Servers without static declarations or references keep the existing identity and
 bootstrap behavior. This API currently applies to Geth execution clients.
+
+## Runtime profiles and Docker images
+
+Servers keep a compiler-neutral `SystemProfile`. Default profiles and their
+platform-specific Docker images are supplied by each Service. Compile with
+`seedemu.compiler.Docker`; it collects these declarations automatically.
+
+To use a custom image for one Server, declare a derived profile and register its
+Docker mapping before compiling:
+
+```python
+from seedemu.core import SystemProfile
+from seedemu.compiler import Docker, DockerImage, Platform
+from chainseed.common.systems import ETHEREUM_POS
+
+custom = SystemProfile("example.ethereum.pos", subset=ETHEREUM_POS)
+ethereum.setDockerImage(
+    custom,
+    DockerImage("my-ethereum:latest", software=[]),
+    Platform.AMD64,
+)
+geth0.setBaseSystem(custom)
+
+emu.render()
+emu.compile(Docker(platform=Platform.AMD64), "output")
+```
+
+The custom image must contain the clients required by the selected Server role.
+`SystemProfile.subset` declares compatible runtime capabilities; it does not
+build Docker image layers. `DockerImage.software` lists software already present;
+its optional `subset` supplies inherited software metadata. Only claim what the
+image actually includes. Register a separate mapping for ARM64 when needed.
+Within an emulation, each profile alias must have one consistent `subset`
+inheritance chain. Identical definitions can be reused across Servers and Services.
+Unmapped profiles and conflicting Service declarations fail during compilation.

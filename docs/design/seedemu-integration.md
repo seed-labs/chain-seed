@@ -4,17 +4,18 @@
 
 ## Implementation status
 
-ChainSEED currently targets the SeedEmu `development` branch, packaged
-as `0.0.7`. It checks `SystemProfile` and Docker extension hooks directly;
-SeedEmu does not expose `EXTENSION_API_VERSION`. The upstream legacy blockchain
-implementations remain in place. Network definitions are shared from E00
-`mini_internet.py`, including unrendered network dumps.
+ChainSeed 1.0.0 depends on SeedEmu 1.0.0 (`seedemu>=1.0.0,<2.0.0`).
+The SeedEmu `release` branch contains the network emulator and generic extension
+interfaces; blockchain implementations, images, and tests belong to ChainSeed.
+Both distributions support ordinary wheel installation. Imports additionally
+check the required `SystemProfile` and Docker hooks. Network definitions are
+shared from E00 `mini_internet.py`, including unrendered network dumps.
 
 Currently implemented in the coordinated working trees:
 
 - explicit ChainSeed imports and ordinary `Emulator.addLayer()` integration;
-- ChainSeed-owned `SystemProfile` objects selected by `ChainSeedDocker` through the existing `Node.setBaseSystem` API;
-- protected Docker image-catalog hooks for ChainSeed profiles;
+- ChainSeed-owned `SystemProfile` objects selected by `Docker` through the existing `Node.setBaseSystem` API;
+- Service-owned `getDockerImages(platform)` declarations collected by native Docker;
 - the public `Docker.addContainerBundle()` API for the EthExplorer bundle.
 
 Planned, but not yet implemented by SeedEmu:
@@ -133,7 +134,7 @@ image currently has no `subset` relationship. During binding, the compatible,
 more specialized profile is retained. Unrelated concrete
 profiles still conflict. Docker image selection remains an exact profile lookup,
 and architecture, repository, tag, and software metadata stay in
-`chainseed.compiler` rather than on `Node`.
+each Service implementation rather than on `Node`.
 
 ### Runtime Testing
 
@@ -195,34 +196,22 @@ external service repositories.
 
 ## Compiler Boundary
 
-SeedEmu's built-in compilers consume only the rendered generic node model and
-must not import ChainSeed or contain chain-specific image selection. ChainSeed
-provides its own `Docker` subclass as the adapter for its runtime systems.
+Servers declare compiler-neutral `SystemProfile` aliases, applied to Nodes at binding.
+Each Service supplies Docker images through `getDockerImages(platform)`.
+Native SeedEmu Docker collects built-in and Service mappings before compiling
+nodes, checks conflicts, and selects the exact Profile's DockerImage to generate
+Dockerfiles and Compose. SeedEmu neither imports ChainSeed nor hardcodes its images.
 
-```mermaid
-flowchart LR
-    Service["External service"]
-    Model["Generic Node model"]
-    ChainDocker["ChainSeedDocker"]
-    Other["Other compatible compiler"]
-    Output["Deployment artifact"]
-
-    Service --> Model
-    Model --> ChainDocker
-    Model --> Other
-    ChainDocker --> Output
-    Other --> Output
-```
-
-ChainSeed services write only a runtime profile. `ChainSeedDocker` extends the
-protected system-image catalog hook with the `(profile, platform) -> DockerImage`
-mapping and inspects Monero targets for the optional custom-image override.
+Each Service declares its images in `getDockerImages(platform)`. Users can register a custom
+mapping with `service.setDockerImage(profile, image, platform)` and select it
+with `server.setBaseSystem(profile)`. Conflicting declarations across Services
+and missing platform mappings fail explicitly. Monero `setCustomBaseImage()`
+sets the network default Profile without replacing other explicit Server profiles.
 
 EthExplorer lives in `chainseed.visualization` and inherits SeedEmu's
 `ContainerBundle`. Register it through `Docker.addContainerBundle(explorer)`;
 SeedEmu emits its container services, build files and network configuration.
-The bundle selects the chain and Geth/Beacon endpoints itself. `ChainSeedDocker`
-does not participate in Explorer deployment.
+The bundle selects the chain and Geth/Beacon endpoints itself.
 
 Lookingglass is an ordinary EthereumService Server, created with
 `createLookingglassServer()` and bound to an emulated host. It resolves all
@@ -240,8 +229,7 @@ Allowed:
 ```python
 from seedemu import Binding, Emulator, Filter
 from seedemu.core import Emulator, Node, Service, Server
-from seedemu.compiler import Docker, Platform
-from chainseed.compiler import ChainSeedDocker
+from seedemu.compiler import Docker, DockerImage, Platform
 ```
 
 Explicit imports are preferred in library code because they make compatibility
@@ -252,7 +240,6 @@ violation.
 Not allowed in ChainSeed service implementations:
 
 ```python
-from seedemu.compiler.DockerImage import DockerImage
 from seedemu.services.EthereumService import EthereumService
 ```
 
@@ -266,8 +253,8 @@ to:
 
 1. import all public extension interfaces;
 2. render a minimal Ethereum PoS topology;
-3. compile it with `ChainSeedDocker`;
-4. verify the selected ChainSeed image in public compiler output and confirm that ordinary `Docker` does not silently accept ChainSeed system names.
+3. compile it with `Docker`;
+4. verify the Service-declared image in compiler output and reject undeclared profiles.
 
 When the planned extension metadata and dump work lands, the suite will also:
 

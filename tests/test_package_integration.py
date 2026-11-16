@@ -10,7 +10,7 @@ import yaml
 
 from seedemu.core import Action, Binding, Emulator, Filter
 from seedemu.layers import Base, Routing
-from chainseed import ChainSeedDocker
+from seedemu.compiler import Docker
 from chainseed.services.ethereum import ConsensusMechanism, EthereumService
 
 
@@ -35,7 +35,7 @@ class PackageIntegrationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             try:
                 emulator.render()
-                emulator.compile(compiler or ChainSeedDocker(), directory + "/output")
+                emulator.compile(compiler or Docker(), directory + "/output")
                 compose = yaml.safe_load(Path(directory, "output/docker-compose.yml").read_text())
                 dockerfiles = []
                 for entry in compose["services"].values():
@@ -64,7 +64,7 @@ class PackageIntegrationTests(unittest.TestCase):
         chain.createBeaconSetupNode("setup")
         emulator.addLayer(service)
         from chainseed.visualization import EthExplorer
-        compiler = ChainSeedDocker()
+        compiler = Docker()
         compiler.addContainerBundle(EthExplorer(emulator, chain_name="pos"))
         compose = self.compile(emulator, compiler)
         self.assertIn("seedemu-ethexplorer-backend", compose["services"])
@@ -94,7 +94,7 @@ class PackageIntegrationTests(unittest.TestCase):
         emulator.addLayer(service)
         self.compile(emulator)
 
-    def test_monero_custom_image_is_applied_by_plugin_compiler(self):
+    def test_monero_custom_image_uses_native_docker(self):
         from chainseed.services.monero import MoneroService
 
         emulator = self.make_emulator(["seed"])
@@ -105,6 +105,50 @@ class PackageIntegrationTests(unittest.TestCase):
         emulator.addLayer(service)
         compose = self.compile(emulator)
         self.assertIn("FROM chainseed-monero-fixture:static", self.compiled_dockerfiles)
+
+    def test_custom_server_profile_reaches_dockerfile(self):
+        from seedemu.compiler import DockerImage, Platform
+        from seedemu.core import SystemProfile
+        from chainseed.common.systems import ETHEREUM_LEGACY
+
+        emulator = self.make_emulator(["default", "custom"])
+        service = EthereumService()
+        chain = service.createBlockchain("poa", ConsensusMechanism.POA)
+        chain.createNode("default").setBootNode(True).startMiner()
+        custom = SystemProfile("example.ethereum.custom", subset=ETHEREUM_LEGACY)
+        chain.createNode("custom").setBaseSystem(custom)
+        service.setDockerImage(custom, DockerImage("example-ethereum:custom", []), Platform.AMD64)
+        emulator.addLayer(service)
+        self.compile(emulator)
+        self.assertIn("FROM example-ethereum:custom", self.compiled_dockerfiles)
+        self.assertIn("FROM handsonsecurity/seedemu-ethereum:legacy", self.compiled_dockerfiles)
+
+    def test_monero_network_image_preserves_explicit_server_profile(self):
+        from seedemu.compiler import DockerImage, Platform
+        from seedemu.core import SystemProfile
+        from chainseed.common.systems import MONERO
+        from chainseed.services.monero import MoneroService
+
+        emulator = self.make_emulator(["seed", "custom", "late", "other"])
+        service = MoneroService()
+        chain = service.createBlockchain("monero")
+        seed = chain.createSeedNode("seed")
+        custom = SystemProfile("example.monero.server", subset=MONERO)
+        explicit = chain.createClientNode("custom").setBaseSystem(custom)
+        service.setDockerImage(custom, DockerImage("example-monero:server", []), Platform.AMD64)
+        chain.setCustomBaseImage("example-monero:first")
+        chain.setCustomBaseImage("example-monero:network")
+        late = chain.createClientNode("late")
+        other = service.createBlockchain("other")
+        other.setCustomBaseImage("example-monero:other")
+        other.createSeedNode("other")
+        self.assertEqual(explicit.getBaseSystem(), custom)
+        self.assertEqual(seed.getBaseSystem(), chain.getSystemProfile())
+        self.assertEqual(late.getBaseSystem(), chain.getSystemProfile())
+        emulator.addLayer(service)
+        self.compile(emulator)
+        for name in ("network", "server", "other"):
+            self.assertIn("FROM example-monero:" + name, self.compiled_dockerfiles)
 
     def test_monero_seed_connection_policies_reach_start_scripts(self):
         from chainseed.services.monero import MoneroSeedConnectionMode, MoneroService
@@ -191,7 +235,7 @@ class PackageIntegrationTests(unittest.TestCase):
         # SeedEmu supplies the required hooks without an API version marker.
         check_seedemu_compatibility()
         with patch.object(Docker, "addContainerBundle", None):
-            with self.assertRaisesRegex(RuntimeError, r"Docker\.addContainerBundle.*development branch"):
+            with self.assertRaisesRegex(RuntimeError, r"Docker\.addContainerBundle.*seedemu>=1\.0\.0"):
                 check_seedemu_compatibility()
 
 

@@ -1,14 +1,9 @@
 # Ethereum Blockchain (PoS)
 
-This example demonstrates how to create an Ethereum proof-of-stake
-private blockchain in the SEED Emulator. The blockchain is started as
-a PoS chain from the genesis state. It uses Geth for the execution
-layer and Lighthouse for the consensus layer.
-
-The example creates separate Geth nodes, Beacon nodes, and Validator
-Client nodes. It also creates a Beacon Setup node, which prepares the
-configuration files and genesis data needed by the Beacon nodes and
-Validator Clients.
+This example deploys a private Ethereum proof-of-stake (PoS) network using Geth
+execution clients and Lighthouse Beacon and Validator Clients. A Beacon Setup
+node prepares the shared configuration and genesis data so the chain starts
+directly in PoS mode.
 
 ![](pics/POS-1.png)
 
@@ -250,7 +245,7 @@ compiling the Docker output.
 ```python
 from chainseed.visualization import EthExplorer
 
-docker = ChainSeedDocker(internetMapEnabled=True, platform=platform)
+docker = Docker(internetMapEnabled=True, platform=platform)
 if ether_view_enabled:
     docker.addContainerBundle(EthExplorer(emu, chain_name="pos"))
 

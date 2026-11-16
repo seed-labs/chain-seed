@@ -2,7 +2,7 @@
 # encoding: utf-8
 # __author__ = 'Demon'
 
-from chainseed.compiler import ChainSeedDocker
+from seedemu.compiler import Docker
 from chainseed.services.ethereum import *
 from seedemu.core import Emulator, Binding, Filter
 from seedemu.compiler import Docker
@@ -35,4 +35,4 @@ sim.addBinding(Binding('eth4', filter = Filter(asn = 153)))
 sim.addLayer(eth)
 sim.render()
 
-sim.compile(ChainSeedDocker(), './eth-private-network')
+sim.compile(Docker(), './eth-private-network')

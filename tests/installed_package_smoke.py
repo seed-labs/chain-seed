@@ -16,7 +16,8 @@ def main():
 
     import seedemu
     assert metadata.version("seedemu")
-    # SeedEmu development currently needs its source assets (editable install).
+    assert "site-packages" in str(Path(seedemu.__file__).resolve())
+    assert metadata.version("seedemu") == "1.0.0"
     import chainseed
     from chainseed.services.chainlink import ChainlinkService
     from chainseed.services.ethereum import EthereumService
@@ -29,6 +30,7 @@ def main():
 
     assert "site-packages" in str(Path(chainseed.__file__).resolve())
     assert metadata.metadata("chainseed")["Name"] == "chainseed"
+    assert metadata.version("chainseed") == "1.0.0"
     assert all((ChainlinkService, EthereumService, MoneroService, SolanaService))
     entries = metadata.distribution("chainseed").entry_points
     assert any(entry.name == "chainseed-test" for entry in entries)
@@ -48,7 +50,7 @@ def main():
                     raise RuntimeError(result.stdout + result.stderr)
             assert (root / "pos-output/docker-compose.yml").is_file()
             assert (root / "poa.bin").is_file()
-            print("Copied Ethereum examples work with installed ChainSEED and SeedEmu development")
+            print("Copied Ethereum examples work with installed ChainSEED and SeedEmu wheels")
             for example in ("E01_ethereum_pos", "E02_eth_explorer", "E03_lookingglass", "E04_faucet", "E05_deploy_contract", "E06_oracle", "E07_validator"):
                 manifest = root / "examples" / "ethereum" / example / "example.yaml"
                 result = subprocess.run(

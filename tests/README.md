@@ -15,6 +15,10 @@ chainseed-test compile examples/ethereum/E01_ethereum_pos/example.yaml
 chainseed-test all examples/ethereum/E01_ethereum_pos/example.yaml
 ```
 
+When using an HTTP proxy, include `localhost,127.0.0.1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16`
+in `NO_PROXY` and `no_proxy` so host-side API checks reach the emulated nodes
+directly. Use CIDR ranges for Python requests rather than wildcards such as `10.*`.
+
 `conftest.py` isolates SeedEmu's currently class-level container-bundle list
 between pytest tests. Production multi-compiler isolation needs an upstream fix.
 
@@ -22,10 +26,8 @@ between pytest tests. Production multi-compiler isolation needs an upstream fix.
 belongs in example manifests and runtime programs, shared by local runs and
 GitHub Actions.
 
-ChainSeed CI checks out SeedEmu `Docker`, installs it in editable mode,
-and verifies the installed ChainSEED wheel and copied examples. Upstream SeedEmu
-currently omits legacy blockchain template assets from its wheel; using its
-source assets avoids the missing upstream wheel resources.
+ChainSeed CI checks out SeedEmu `release`, builds both wheels,
+and verifies both installed packages and copied examples without editable installs.
 `test_package_integration.py` compiles Ethereum PoA/PoW/PoS, Explorer, Monero,
 Solana and Chainlink configurations, including a custom Geth binary. Explorer
 is registered as a ContainerBundle; its native-Docker compilation, endpoint

@@ -14,7 +14,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from seedemu.compiler import Platform
 from seedemu.core import Action, Binding, Filter
-from chainseed import ChainSeedDocker
+from seedemu.compiler import Docker
 from chainseed.services.ethereum import PoSBeaconServer
 from examples.ethereum.E01_ethereum_pos import ethereum_pos as e01
 
@@ -43,7 +43,7 @@ def run(output=None, platform=Platform.AMD64, override=False):
     emu.render()
     output = Path(output or SCRIPT_DIR / "output").resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
-    emu.compile(ChainSeedDocker(platform=platform, internetMapEnabled=True),
+    emu.compile(Docker(platform=platform, internetMapEnabled=True),
                 str(output), override=override)
     return emu
 

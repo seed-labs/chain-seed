@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chainseed"
-version = "0.1.0a0"
+version = "1.0.0"
 description = "Blockchain protocol extensions, images, tools, and experiments for SeedEmu"
 readme = "README.md"
 requires-python = ">=3.10,<3.11"
@@ -14,7 +14,7 @@ authors = [
 ]
 dependencies = [
   "PyYAML>=6.0,<7",
-  "seedemu>=0.0.7,<0.1",
+  "seedemu>=1.0.0,<2.0.0",
   "eth-account==0.5.9",
   "eth-keys>=0.3.4,<0.4",
   "requests>=2.22",

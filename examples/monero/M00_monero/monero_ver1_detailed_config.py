@@ -26,7 +26,7 @@ import sys
 
 from seedemu import Binding, Filter, Makers
 from seedemu.compiler import Platform
-from chainseed.compiler import ChainSeedDocker
+from seedemu.compiler import Docker
 from chainseed.services.monero import (
     MoneroBinarySource,
     MoneroMiningTrigger,
@@ -190,7 +190,7 @@ _bind(emu, pruned_vnode, 164, host_index=0)
 emu.addLayer(monero)
 emu.render()
 # Compile docker-compose and build context into ./output
-docker = ChainSeedDocker(internetMapEnabled=True, platform=platform)
+docker = Docker(internetMapEnabled=True, platform=platform)
 emu.compile(docker, './output', override = True)
 
 

@@ -43,7 +43,7 @@ class MoneroBaseServer(Server):
             network.getCustomBaseImage()
             or options.binary_source == MoneroBinarySource.MIRROR
         ):
-            self.setBaseSystem(MONERO)
+            self.setBaseSystem(network.getSystemProfile())
 
         # Runtime binding information (populated during configure phase)
         self._resolved_ip: Optional[str] = None

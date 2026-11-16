@@ -6,8 +6,11 @@ __pycache__/
 .ruff_cache/
 .venv/
 /results/
+results/
 build/
 dist/
+output/
+output_*/
 node_modules/
 
 **/output/

@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from chainseed.services.ethereum import *
-from chainseed.compiler import ChainSeedDocker
+from seedemu.compiler import Docker
 from seedemu import *
 import random
 import os, sys
@@ -147,7 +147,7 @@ webHost.appendStartCommand(f'python3 volumes/deployContract.py {getIP(emu.resolv
 webHost.appendStartCommand('cd /volumes/kubo-dapp/ && [ ! -d build ] && npm run build')
 webHost.appendStartCommand('serve -sC /volumes/kubo-dapp/build', fork=True)
 
-docker = ChainSeedDocker(internetMapEnabled=True, platform=platform)
+docker = Docker(internetMapEnabled=True, platform=platform)
 
 # Use the "kubo-webhost-image" custom image from local
 docker.addImage(DockerImage('kubo-webhost-image', [], local = True), priority=-1)

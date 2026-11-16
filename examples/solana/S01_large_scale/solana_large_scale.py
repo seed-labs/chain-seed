@@ -16,7 +16,7 @@ from _deployment import prepare_output
 from seedemu import Binding, Emulator, Filter
 from seedemu.compiler import BASE_IMAGE, DockerImage, Platform
 from seedemu.layers import EtcHosts
-from chainseed import ChainSeedDocker
+from seedemu.compiler import Docker
 from chainseed.services.solana import SolanaService
 
 # Defaults from the final 200-node experiment. No alternate runtime modes.
@@ -70,7 +70,7 @@ def compile_network(output, validators=200, stub_as_count=64, image='seedemu-sol
     emu.addLayer(solana)
     emu.addLayer(EtcHosts())
     emu.render()
-    compiler = ChainSeedDocker(platform=Platform.AMD64, internetMapEnabled=False)
+    compiler = Docker(platform=Platform.AMD64, internetMapEnabled=False)
     compiler.addImage(DockerImage(name=image, software=[], subset=BASE_IMAGE))
     records = []
     for index, host in enumerate(hosts):

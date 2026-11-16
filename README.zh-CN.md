@@ -14,18 +14,18 @@ ChainSeed 支持 Ethereum、Monero、Solana 以及 Chainlink 服务，并提供�
 ## 安装
 
 ChainSeed 依赖 SeedEmu。请参考
-[SeedEmu 安装说明](https://github.com/seed-labs/seed-emulator/blob/development/README.md#getting-started)
+[SeedEmu 安装说明](https://github.com/seed-labs/seed-emulator/blob/release/README.md#getting-started)
 配置所需环境，包括 Python 3.10、Docker Engine 和 Docker Compose，
-然后安装 SeedEmu 的 `development` 分支。
+先安装 SeedEmu 1.0.0，再安装 ChainSeed 1.0.0。
 建议在安装 ChainSeed 前运行一个基础 SeedEmu 例子，确认环境正常。
 
-将两个仓库克隆到同一个工作目录中，其中 SeedEmu 使用 `development` 分支：
+运行例子时，将两个仓库克隆到同一个工作目录中，其中 SeedEmu 使用 `release` 分支：
 
 ```bash
 mkdir -p workspace
 cd workspace
 
-git clone --branch development https://github.com/seed-labs/seed-emulator.git
+git clone --branch release https://github.com/seed-labs/seed-emulator.git
 git clone https://github.com/seed-labs/chain-seed.git
 ```
 
@@ -47,7 +47,7 @@ cd chain-seed
 ```bash
 conda create -n chainseed python=3.10 pip -y
 conda activate chainseed
-python -m pip install -e ../seed-emulator
+python -m pip install ../seed-emulator
 python -m pip install .
 ```
 
@@ -56,11 +56,13 @@ python -m pip install .
 ```bash
 uv venv --python 3.10
 source .venv/bin/activate
-uv pip install -e ../seed-emulator
+uv pip install ../seed-emulator
 uv pip install .
 ```
 
-SeedEmu 使用可编辑模式安装，因此安装后请保留其源码目录。
+正式发布后，可以将上述源码安装命令替换为先执行 `pip install seedemu==1.0.0`，
+再执行 `pip install chainseed==1.0.0`；uv 用户使用相同包名执行 `uv pip install`。
+示例代码仍从本仓库获取。
 
 ## 快速开始
 

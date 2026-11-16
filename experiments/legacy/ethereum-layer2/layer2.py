@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 
-from chainseed.compiler import ChainSeedDocker
+from seedemu.compiler import Docker
 from chainseed.services.ethereum import *
 from seedemu import *
 from L2Util import generateAccounts, writeConfig
@@ -27,7 +27,7 @@ else:
     platform = sys.argv[1]
 
 platform_mapping = {"amd": Platform.AMD64, "arm": Platform.ARM64}
-docker = ChainSeedDocker(platform=platform_mapping[platform])
+docker = Docker(platform=platform_mapping[platform])
 
 # Create the Ethereum layer
 eth = EthereumService(override=True)

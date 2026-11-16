@@ -742,6 +742,39 @@ class EthereumService(Service):
     __blockchain_id: int
     __serial: int
 
+    def getDockerImages(self, platform):
+        """Declare this Service's Docker images for the target architecture."""
+        from seedemu.compiler import BASE_IMAGE, BASE_IMAGE_ARM64, DockerImage, Platform
+        from ...common.systems import ETHEREUM_LEGACY, ETHEREUM_POS, OP_STACK, SC_DEPLOYER
+
+        if platform not in (Platform.AMD64, Platform.ARM64):
+            raise ValueError(f"Unsupported Docker platform: {platform!r}")
+        base = BASE_IMAGE if platform == Platform.AMD64 else BASE_IMAGE_ARM64
+        images = {
+            ETHEREUM_LEGACY: DockerImage(
+                name=('handsonsecurity/seedemu-ethereum:legacy' if platform == Platform.AMD64 else 'handsonsecurity/seedemu-ethereum-arm64:legacy'),
+                software=['software-properties-common', 'python3', 'python3-pip'],
+                subset=base,
+            ),
+            ETHEREUM_POS: DockerImage(
+                name='handsonsecurity/seedemu-ethereum:pos2.0',
+                software=['software-properties-common', 'python3', 'python3-pip'],
+                subset=base,
+            ),
+            OP_STACK: DockerImage(
+                name='huagluck/seedemu-op-stack',
+                software=[],
+                subset=base,
+            ),
+            SC_DEPLOYER: DockerImage(
+                name='huagluck/seedemu-sc-deployer',
+                software=[],
+                subset=base,
+            ),
+        }
+        images.update(super().getDockerImages(platform))
+        return images
+
     def __init__(self, saveState: bool = False, savePath: str = './eth-states', override:bool=False):
         """!
         @brief The EthereumService class initializer.

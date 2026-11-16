@@ -4,16 +4,17 @@
 
 ## 实现状态
 
-ChainSEED 当前适配SeedEmu `development` 分支，发行版本为
-`0.0.7`。导入时直接检查 `SystemProfile` 和 Docker 扩展钩子；SeedEmu
-没有导出 `EXTENSION_API_VERSION`。上游仍保留旧区块链实现。共享网络定义
-位于 E00 的 `mini_internet.py`，支持未 render 的网络 bin 导出。
+ChainSeed 1.0.0 依赖 SeedEmu 1.0.0（`seedemu>=1.0.0,<2.0.0`）。
+SeedEmu 的 `release` 分支包含网络仿真器和通用扩展接口；区块链实现、镜像和测试
+由 ChainSeed 提供。两个发行包均支持普通 wheel 安装，导入时还会检查所需的
+`SystemProfile` 和 Docker 接口。共享网络定义位于 E00 的 `mini_internet.py`，
+支持未 render 的网络 bin 导出。
 
 当前两个配套工作区已经实现：
 
 - 显式导入 ChainSeed，并通过普通的 `Emulator.addLayer()` 完成集成；
-- 通过现有 `Node.setBaseSystem` API 声明 ChainSeed 自有 `SystemProfile`，并由 `ChainSeedDocker` 完成选择；
-- 通过受保护的 Docker 镜像目录钩子接入 ChainSeed profile；
+- 通过现有 `Node.setBaseSystem` API 声明 ChainSeed 自有 `SystemProfile`，并由 `Docker` 完成选择；
+- 原生 Docker 收集 Service 的 `getDockerImages(platform)` 声明；
 - EthExplorer 通过公开的 `Docker.addContainerBundle()` 接入容器编译。
 
 SeedEmu 尚未实现、仍属于计划的内容：
@@ -127,7 +128,7 @@ profile 可通过 `subset` 指向镜像所基于的较通用运行环境；因�
 只声明已经确认的镜像继承关系；尚未完善的 Chainlink 镜像目前不设置 `subset`。
 绑定时会保留兼容且更具体的 profile，互不相关的两个具体 profile 仍然冲突。Docker
 镜像选择仍是精确的 profile 查询；体系结构、镜像仓库、tag 和软件元数据保留在
-`chainseed.compiler`，不写入 `Node`。
+各 Service 实现中，不写入 `Node`。
 
 ### 运行时测试
 
@@ -187,33 +188,21 @@ flowchart LR
 
 ## 编译器边界
 
-SeedEmu 内置编译器只读取渲染后的通用节点模型，不得导入 ChainSeed，
-也不得包含区块链专用镜像选择逻辑。ChainSeed 通过自己的 `Docker` 子类
-适配其运行系统。
+Server 将运行环境声明为通用的 `SystemProfile`，绑定时应用到 Node。
+各 Service 的 `getDockerImages(platform)` 提供该环境的 Docker 镜像声明。
+SeedEmu 原生 Docker 在编译节点前收集内置映射和 Service 映射，检查冲突，
+再通过 Profile 精确查找 DockerImage，生成节点 Dockerfile 和 Compose。
+SeedEmu 不导入 ChainSeed，也不包含 ChainSeed 专属镜像常量。
 
-```mermaid
-flowchart LR
-    Service["外部服务"]
-    Model["通用 Node 模型"]
-    ChainDocker["ChainSeedDocker"]
-    Other["其他兼容编译器"]
-    Output["部署制品"]
-
-    Service --> Model
-    Model --> ChainDocker
-    Model --> Other
-    ChainDocker --> Output
-    Other --> Output
-```
-
-ChainSeed 服务只写入运行 profile。`ChainSeedDocker` 通过覆写受保护的系统镜像
-目录钩子，加入`（profile，目标平台） -> DockerImage` 映射，并在编译时读取
-Monero 服务目标以处理可选的自定义镜像。
+各 Service 直接在 `getDockerImages(platform)` 中声明映射。用户可通过
+`service.setDockerImage(profile, image, platform)` 声明自定义映射，
+再通过 `server.setBaseSystem(profile)` 选择该环境。
+同一 Profile 在不同 Service 中的冲突映射会报错；缺少当前平台的映射也会报错。
+Monero 的 `setCustomBaseImage()` 设置网络默认 Profile，不覆盖 Server 显式选择的其他 Profile。
 
 EthExplorer 位于 `chainseed.visualization`，继承 SeedEmu 的 `ContainerBundle`。
 通过 `Docker.addContainerBundle(explorer)` 注册后，由 SeedEmu 生成其容器服务、
-构建文件和网络配置。链与 Geth/Beacon 端点选择由 Explorer 自己完成，
-`ChainSeedDocker` 不再参与 Explorer 部署。
+构建文件和网络配置。链与 Geth/Beacon 端点选择由 Explorer 自己完成。
 
 Lookingglass 是 EthereumService 下的普通 Server，通过
 `createLookingglassServer()` 创建并绑定到仿真主机。它在 configure 阶段汇总所有链的
@@ -230,8 +219,7 @@ ChainSeed 本来就应依赖并导入 SeedEmu。这里的边界关注依赖方�
 ```python
 from seedemu import Binding, Emulator, Filter
 from seedemu.core import Emulator, Node, Service, Server
-from seedemu.compiler import Docker, Platform
-from chainseed.compiler import ChainSeedDocker
+from seedemu.compiler import Docker, DockerImage, Platform
 ```
 
 库源码推荐显式导入，这样兼容性变化更容易发现。教学示例可以继续使用
@@ -240,7 +228,6 @@ from chainseed.compiler import ChainSeedDocker
 ChainSeed 服务实现中不允许：
 
 ```python
-from seedemu.compiler.DockerImage import DockerImage
 from seedemu.services.EthereumService import EthereumService
 ```
 
@@ -253,8 +240,8 @@ SeedEmu 公共模块不得导入 `chainseed`、检查 ChainSeed 安装路径或�
 
 1. 固定版本的 ChainSeed 测试夹具可以导入全部公共扩展接口；
 2. 能够渲染最小 Ethereum PoS 拓扑；
-3. 能够使用 `ChainSeedDocker` 完成编译；
-4. 能够从公开编译制品中验证所选 ChainSeed 镜像，并确认普通 `Docker` 不会静默接受 ChainSeed 系统名称。
+3. 能够使用 `Docker` 完成编译；
+4. 能够从公开编译制品中验证 Service 声明的镜像，并确认未声明的 Profile 会报错。
 
 扩展元数据与 dump 功能实现后，测试套件还将：
 

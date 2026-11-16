@@ -11,7 +11,7 @@ if str(REPO_ROOT) not in sys.path:
 from examples.ethereum.E00_ethereum_poa import mini_internet
 
 from seedemu import *
-from chainseed.compiler import ChainSeedDocker
+from seedemu.compiler import Docker
 from chainseed.services.ethereum import *
 import sys, os
 
@@ -161,7 +161,7 @@ emu.dump('blockchain_poa.bin')
 
 emu.render()
 
-docker = ChainSeedDocker(platform=platform)
+docker = Docker(platform=platform)
 
 # If output directory exists and override is set to false, we call exit(1)
 # updateOutputdirectory will not be called

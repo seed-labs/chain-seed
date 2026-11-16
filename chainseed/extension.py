@@ -17,9 +17,9 @@ class ChainSeedExtension:
 
 descriptor = ChainSeedExtension(
     distribution="chainseed",
-    version="0.1.0a0",
+    version="1.0.0",
     extension_api_version=1,
-    seedemu_min_version="0.0.7",
+    seedemu_min_version="1.0.0",
     owned_layer_names=(
         "EthereumService",
         "MoneroService",
@@ -37,14 +37,16 @@ def check_seedemu_compatibility() -> None:
 
     required = {
         "seedemu.core.SystemProfile": hasattr(core, "SystemProfile"),
-        "Docker._getSystemImageCatalog": callable(getattr(Docker, "_getSystemImageCatalog", None)),
+        "Service.getDockerImages": callable(getattr(core.Service, "getDockerImages", None)),
+        "Service.setDockerImage": callable(getattr(core.Service, "setDockerImage", None)),
+        "Docker._collectServiceImages": callable(getattr(Docker, "_collectServiceImages", None)),
         "Docker.addContainerBundle": callable(getattr(Docker, "addContainerBundle", None)),
     }
     missing = [name for name, available in required.items() if not available]
     if missing:
         raise RuntimeError(
             "chainseed is missing required SeedEmu capabilities: " + ", ".join(missing) + "; "
-            "install SeedEmu from the development branch. The distribution "
+            "install seedemu>=1.0.0,<2.0.0. The distribution "
             "version alone does not identify these capabilities."
         )
 

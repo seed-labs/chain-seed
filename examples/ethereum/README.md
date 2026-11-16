@@ -13,3 +13,9 @@
 | [E08_ipfs_kubo_dapp](E08_ipfs_kubo_dapp/) | IPFS/Kubo DApp |
 | [E09_blockchain](E09_blockchain/) | Blockchain configuration |
 | [E10_large_scale](E10_large_scale/) | Large-scale PoS network |
+
+## Platforms
+
+The Ethereum service can target AMD64 and ARM64 using platform-specific Docker
+images. Custom images and client binaries must be compatible with the selected
+architecture.

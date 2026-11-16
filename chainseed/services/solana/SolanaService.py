@@ -22,10 +22,28 @@ class SolanaService(Service):
     cluster's bootstrap node; during *render* each server installs the real
     Agave toolchain onto its physical node.
 
-    Nodes declare the ChainSeed Solana runtime system. `ChainSeedDocker` maps it
+    Nodes declare the ChainSeed Solana runtime system. SeedEmu Docker maps it
     to the platform-specific image containing the pinned Agave binaries (see
     docker_images/solana).
     """
+
+    def getDockerImages(self, platform):
+        """Declare this Service's Docker images for the target architecture."""
+        from seedemu.compiler import BASE_IMAGE, BASE_IMAGE_ARM64, DockerImage, Platform
+        from ...common.systems import SOLANA
+
+        if platform not in (Platform.AMD64, Platform.ARM64):
+            raise ValueError(f"Unsupported Docker platform: {platform!r}")
+        base = BASE_IMAGE if platform == Platform.AMD64 else BASE_IMAGE_ARM64
+        images = {
+            SOLANA: DockerImage(
+                name='handsonsecurity/seedemu-solana:1.0',
+                software=[],
+                subset=base,
+            ),
+        }
+        images.update(super().getDockerImages(platform))
+        return images
 
     def __init__(self):
         super().__init__()

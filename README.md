@@ -18,20 +18,20 @@ and security experiments.
 ## Installation
 
 ChainSeed depends on SeedEmu. Follow the
-[SeedEmu installation instructions](https://github.com/seed-labs/seed-emulator/blob/development/README.md#getting-started)
+[SeedEmu installation instructions](https://github.com/seed-labs/seed-emulator/blob/release/README.md#getting-started)
 to set up the required environment, including Python 3.10, Docker Engine,
-and Docker Compose, then install SeedEmu from its `development` branch.
+and Docker Compose. Install SeedEmu 1.0.0 before ChainSeed 1.0.0.
 We recommend running a basic SeedEmu example to verify the environment
 before installing ChainSeed.
 
-Clone both repositories into the same workspace, using the `development` branch
-of SeedEmu:
+To run the examples, clone both repositories into the same workspace, using the
+`release` branch of SeedEmu:
 
 ```bash
 mkdir -p workspace
 cd workspace
 
-git clone --branch development https://github.com/seed-labs/seed-emulator.git
+git clone --branch release https://github.com/seed-labs/seed-emulator.git
 git clone https://github.com/seed-labs/chain-seed.git
 ```
 
@@ -53,7 +53,7 @@ cd chain-seed
 ```bash
 conda create -n chainseed python=3.10 pip -y
 conda activate chainseed
-python -m pip install -e ../seed-emulator
+python -m pip install ../seed-emulator
 python -m pip install .
 ```
 
@@ -62,11 +62,13 @@ python -m pip install .
 ```bash
 uv venv --python 3.10
 source .venv/bin/activate
-uv pip install -e ../seed-emulator
+uv pip install ../seed-emulator
 uv pip install .
 ```
 
-SeedEmu is installed in editable mode, so keep its source directory after installation.
+After the packages are published, the source installation commands above can be
+replaced with `pip install seedemu==1.0.0` followed by `pip install chainseed==1.0.0`
+(or `uv pip install` with the same package names). The examples remain in this repository.
 
 ## Quick start
 
