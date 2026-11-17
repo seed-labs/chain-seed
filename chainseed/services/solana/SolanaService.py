@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from seedemu.compiler import BASE_IMAGE, BASE_IMAGE_ARM64, DockerImage, Platform
+from ...common.systems import SOLANA
+
 from typing import Dict, List, Optional
 
 from seedemu.core.Emulator import Emulator
@@ -27,23 +30,16 @@ class SolanaService(Service):
     docker_images/solana).
     """
 
-    def getDockerImages(self, platform):
-        """Declare this Service's Docker images for the target architecture."""
-        from seedemu.compiler import BASE_IMAGE, BASE_IMAGE_ARM64, DockerImage, Platform
-        from ...common.systems import SOLANA
-
-        if platform not in (Platform.AMD64, Platform.ARM64):
-            raise ValueError(f"Unsupported Docker platform: {platform!r}")
-        base = BASE_IMAGE if platform == Platform.AMD64 else BASE_IMAGE_ARM64
-        images = {
+    DOCKER_IMAGES = {
+        platform: {
             SOLANA: DockerImage(
                 name='handsonsecurity/seedemu-solana:1.0',
                 software=[],
-                subset=base,
+                subset=(BASE_IMAGE if platform == Platform.AMD64 else BASE_IMAGE_ARM64),
             ),
         }
-        images.update(super().getDockerImages(platform))
-        return images
+        for platform in (Platform.AMD64, Platform.ARM64)
+    }
 
     def __init__(self):
         super().__init__()

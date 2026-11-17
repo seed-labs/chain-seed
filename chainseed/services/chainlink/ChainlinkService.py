@@ -1,3 +1,4 @@
+from seedemu.compiler import DockerImage, Platform
 from seedemu.core import Emulator, Node, Service
 from seedemu.core.Service import Server
 from seedemu.core.enums import NetworkType
@@ -191,22 +192,16 @@ class ChainlinkService(Service):
 
     __chain_id:int
 
-    def getDockerImages(self, platform):
-        """Declare this Service's Docker images for the target architecture."""
-        from seedemu.compiler import DockerImage, Platform
-        from ...common.systems import CHAINLINK
-
-        if platform not in (Platform.AMD64, Platform.ARM64):
-            raise ValueError(f"Unsupported Docker platform: {platform!r}")
-        images = {
+    DOCKER_IMAGES = {
+        platform: {
             CHAINLINK: DockerImage(
                 name=('amanvelani/chainlink-develop:amd64' if platform == Platform.AMD64 else 'amanvelani/chainlink-develop:arm64'),
                 software=[],
                 subset=None,
             ),
         }
-        images.update(super().getDockerImages(platform))
-        return images
+        for platform in (Platform.AMD64, Platform.ARM64)
+    }
 
     def __init__(self, eth_server:str='', faucet_server:str='', utility_server:str=''):
         """

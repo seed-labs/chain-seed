@@ -194,7 +194,8 @@ SeedEmu 原生 Docker 在编译节点前收集内置映射和 Service 映射，�
 再通过 Profile 精确查找 DockerImage，生成节点 Dockerfile 和 Compose。
 SeedEmu 不导入 ChainSeed，也不包含 ChainSeed 专属镜像常量。
 
-各 Service 直接在 `getDockerImages(platform)` 中声明映射。用户可通过
+各 Service 在 `DOCKER_IMAGES` 常量中按平台、`SystemProfile` 声明映射，
+由基类 `Service.getDockerImages(platform)` 统一读取，并应用实例级覆盖。用户可通过
 `service.setDockerImage(profile, image, platform)` 声明自定义映射，
 再通过 `server.setBaseSystem(profile)` 选择该环境。
 同一 Profile 在不同 Service 中的冲突映射会报错；缺少当前平台的映射也会报错。

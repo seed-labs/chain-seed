@@ -197,8 +197,9 @@ ChainSeed 只依赖一组较小的公共接口，不依赖编译器内部实现�
 | 运行时测试 | 容器列表、标签、命名空间、命令和探针 |
 | 扩展元数据 | 名称、版本、SeedEmu API 版本和层名称 |
 
-Server 保存通用的 `SystemProfile` 别名；各 Service 的 `getDockerImages(platform)`
-返回该后端所需的 `DockerImage` 声明。SeedEmu 原生 Docker 在编译前收集并验证这些映射，
+Server 保存通用的 `SystemProfile` 别名；各 Service 在 `DOCKER_IMAGES` 常量中
+声明平台、Profile 到 `DockerImage` 的映射，基类 `Service.getDockerImages(platform)`
+统一读取默认映射并应用实例级覆盖。SeedEmu 原生 Docker 在编译前收集并验证这些映射，
 再根据节点 Profile 选择基础镜像。同一 Profile 或镜像名的冲突声明会报错。
 Monero 自定义镜像也通过 Profile 和 Service 映射处理。
 

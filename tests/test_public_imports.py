@@ -85,6 +85,50 @@ class PublicImportTests(unittest.TestCase):
         with self.assertRaisesRegex(KeyError, "does not support system profile chainseed.ethereum.pos"):
             Docker()._selectImageFor(pos)
 
+    def test_service_image_defaults_and_instance_overrides(self):
+        from seedemu.core import Service
+        from seedemu.compiler import DockerImage, Platform
+        from chainseed.common.systems import ETHEREUM_POS
+        from chainseed.services.ethereum import EthereumService
+        from chainseed.services.monero import MoneroService
+        from chainseed.services.solana import SolanaService
+        from chainseed.services.chainlink import ChainlinkService
+
+        for service_type in (EthereumService, MoneroService, SolanaService, ChainlinkService):
+            self.assertIs(service_type.getDockerImages, Service.getDockerImages)
+
+        first, second = EthereumService(), EthereumService()
+        defaults = first.getDockerImages(Platform.AMD64)
+        defaults[ETHEREUM_POS].addSoftwares(["example-package"])
+        defaults.clear()
+        for service in (first, second):
+            image = service.getDockerImages(Platform.AMD64)[ETHEREUM_POS]
+            self.assertNotIn("example-package", image.getSoftware())
+        override = DockerImage("example:pos", [])
+        first.setDockerImage(ETHEREUM_POS, override, Platform.AMD64)
+        self.assertIs(first.getDockerImages(Platform.AMD64)[ETHEREUM_POS], override)
+        self.assertEqual(second.getDockerImages(Platform.AMD64)[ETHEREUM_POS].getName(),
+                         "handsonsecurity/seedemu-ethereum:pos2.0")
+        self.assertEqual(first.getDockerImages(Platform.ARM64)[ETHEREUM_POS].getName(),
+                         "handsonsecurity/seedemu-ethereum:pos2.0")
+
+    def test_monero_custom_image_registration_preserves_override(self):
+        from seedemu.compiler import DockerImage, Platform
+        from chainseed.services.monero import MoneroService, MoneroNetworkDefaults
+
+        service = MoneroService()
+        chain = service.createBlockchain("custom", defaults=MoneroNetworkDefaults(
+            custom_base_image="example:monero"))
+        profile = chain.getSystemProfile()
+        for platform in Platform:
+            self.assertEqual(service.getDockerImages(platform)[profile].getName(), "example:monero")
+        override = DockerImage("example:override", [])
+        service.setDockerImage(profile, override, Platform.AMD64)
+        chain.setCustomBaseImage("example:monero")
+        self.assertIs(service.getDockerImages(Platform.AMD64)[profile], override)
+        service.createBlockchain("other").setCustomBaseImage("example:monero")
+        self.assertIs(service.getDockerImages(Platform.AMD64)[profile], override)
+
     def test_service_image_registration_rejects_invalid_arguments(self):
         from seedemu.core import Service, SystemProfile
         from seedemu.compiler import DockerImage, Platform

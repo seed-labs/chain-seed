@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from seedemu.compiler import BASE_IMAGE, BASE_IMAGE_ARM64, DockerImage, Platform
+from ...common.systems import ETHEREUM_LEGACY, ETHEREUM_POS, OP_STACK, SC_DEPLOYER
+
 from chainseed.services.ethereum import *
 from .EthEnum import ConsensusMechanism, EthUnit
 from .EthUtil import Genesis, EthAccount, AccountStructure
@@ -742,38 +745,31 @@ class EthereumService(Service):
     __blockchain_id: int
     __serial: int
 
-    def getDockerImages(self, platform):
-        """Declare this Service's Docker images for the target architecture."""
-        from seedemu.compiler import BASE_IMAGE, BASE_IMAGE_ARM64, DockerImage, Platform
-        from ...common.systems import ETHEREUM_LEGACY, ETHEREUM_POS, OP_STACK, SC_DEPLOYER
-
-        if platform not in (Platform.AMD64, Platform.ARM64):
-            raise ValueError(f"Unsupported Docker platform: {platform!r}")
-        base = BASE_IMAGE if platform == Platform.AMD64 else BASE_IMAGE_ARM64
-        images = {
+    DOCKER_IMAGES = {
+        platform: {
             ETHEREUM_LEGACY: DockerImage(
                 name=('handsonsecurity/seedemu-ethereum:legacy' if platform == Platform.AMD64 else 'handsonsecurity/seedemu-ethereum-arm64:legacy'),
                 software=['software-properties-common', 'python3', 'python3-pip'],
-                subset=base,
+                subset=(BASE_IMAGE if platform == Platform.AMD64 else BASE_IMAGE_ARM64),
             ),
             ETHEREUM_POS: DockerImage(
                 name='handsonsecurity/seedemu-ethereum:pos2.0',
                 software=['software-properties-common', 'python3', 'python3-pip'],
-                subset=base,
+                subset=(BASE_IMAGE if platform == Platform.AMD64 else BASE_IMAGE_ARM64),
             ),
             OP_STACK: DockerImage(
                 name='huagluck/seedemu-op-stack',
                 software=[],
-                subset=base,
+                subset=(BASE_IMAGE if platform == Platform.AMD64 else BASE_IMAGE_ARM64),
             ),
             SC_DEPLOYER: DockerImage(
                 name='huagluck/seedemu-sc-deployer',
                 software=[],
-                subset=base,
+                subset=(BASE_IMAGE if platform == Platform.AMD64 else BASE_IMAGE_ARM64),
             ),
         }
-        images.update(super().getDockerImages(platform))
-        return images
+        for platform in (Platform.AMD64, Platform.ARM64)
+    }
 
     def __init__(self, saveState: bool = False, savePath: str = './eth-states', override:bool=False):
         """!

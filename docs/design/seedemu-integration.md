@@ -202,7 +202,9 @@ Native SeedEmu Docker collects built-in and Service mappings before compiling
 nodes, checks conflicts, and selects the exact Profile's DockerImage to generate
 Dockerfiles and Compose. SeedEmu neither imports ChainSeed nor hardcodes its images.
 
-Each Service declares its images in `getDockerImages(platform)`. Users can register a custom
+Each Service declares a `DOCKER_IMAGES` constant, keyed by platform and then
+`SystemProfile`. The shared `Service.getDockerImages(platform)` reads these defaults
+and applies per-instance overrides. Users can register a custom
 mapping with `service.setDockerImage(profile, image, platform)` and select it
 with `server.setBaseSystem(profile)`. Conflicting declarations across Services
 and missing platform mappings fail explicitly. Monero `setCustomBaseImage()`

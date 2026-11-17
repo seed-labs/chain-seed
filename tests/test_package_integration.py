@@ -245,7 +245,7 @@ class PackageIntegrationTests(unittest.TestCase):
         # SeedEmu supplies the required hooks without an API version marker.
         check_seedemu_compatibility()
         with patch.object(Docker, "addContainerBundle", None):
-            with self.assertRaisesRegex(RuntimeError, r"Docker\.addContainerBundle.*seedemu>=1\.0\.0"):
+            with self.assertRaisesRegex(RuntimeError, r"Docker\.addContainerBundle.*install seedemu"):
                 check_seedemu_compatibility()
 
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from seedemu.compiler import BASE_IMAGE, BASE_IMAGE_ARM64, DockerImage, Platform
+
 import os
 from typing import Dict, Iterator, List, Optional, Tuple
 
@@ -38,29 +40,16 @@ class MoneroService(Service):
     to keep the semantics clean.
     """
 
-    def getDockerImages(self, platform):
-        """Declare this Service's Docker images for the target architecture."""
-        from seedemu.compiler import BASE_IMAGE, BASE_IMAGE_ARM64, DockerImage, Platform
-        from ...common.systems import MONERO
-
-        if platform not in (Platform.AMD64, Platform.ARM64):
-            raise ValueError(f"Unsupported Docker platform: {platform!r}")
-        base = BASE_IMAGE if platform == Platform.AMD64 else BASE_IMAGE_ARM64
-        images = {
+    DOCKER_IMAGES = {
+        platform: {
             MONERO: DockerImage(
                 name='handsonsecurity/seedemu-monero:latest',
                 software=[],
-                subset=base,
+                subset=(BASE_IMAGE if platform == Platform.AMD64 else BASE_IMAGE_ARM64),
             ),
         }
-
-        for network in self.__networks.values():
-            if network.getCustomBaseImage():
-                images[network.getSystemProfile()] = DockerImage(
-                    name=network.getCustomBaseImage(), software=[],
-                )
-        images.update(super().getDockerImages(platform))
-        return images
+        for platform in (Platform.AMD64, Platform.ARM64)
+    }
 
     def __init__(self):
         super().__init__()
@@ -191,6 +180,8 @@ class MoneroNetwork:
 
         # Track allocated ports to avoid accidental reuse. Key is (port, purpose).
         self._allocated_ports: Dict[Tuple[int, str], str] = {}
+        if self.getCustomBaseImage():
+            self._registerCustomBaseImage()
 
     
     # Public API
@@ -285,10 +276,20 @@ class MoneroNetwork:
             raise ValueError("image_name must be a non-empty Docker image name")
         previous = self.getSystemProfile()
         self._defaults.custom_base_image = image_name
+        self._registerCustomBaseImage()
         for server in self._nodes.values():
             if server.getBaseSystem() in (previous, BaseSystem.DEFAULT):
                 server.setBaseSystem(self.getSystemProfile())
         return self
+
+    def _registerCustomBaseImage(self):
+        profile = self.getSystemProfile()
+        for platform in (Platform.AMD64, Platform.ARM64):
+            # Retain any explicit mapping already supplied through setDockerImage().
+            if profile not in self._service.getDockerImages(platform):
+                self._service.setDockerImage(
+                    profile, DockerImage(self.getCustomBaseImage(), software=[]), platform,
+                )
 
     def setDefaultWalletTemplate(self, spec: MoneroWalletSpec) -> "MoneroNetwork":
         self._defaults.wallet = spec.clone()

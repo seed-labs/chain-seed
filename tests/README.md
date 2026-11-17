@@ -26,7 +26,7 @@ between pytest tests. Production multi-compiler isolation needs an upstream fix.
 belongs in example manifests and runtime programs, shared by local runs and
 GitHub Actions.
 
-ChainSeed CI checks out SeedEmu `development`, builds both wheels,
+ChainSeed CI checks out SeedEmu `release`, builds both wheels,
 and verifies both installed packages and copied examples without editable installs.
 `test_package_integration.py` compiles Ethereum PoA/PoW/PoS, Explorer, Monero,
 Solana and Chainlink configurations, including a custom Geth binary. Explorer

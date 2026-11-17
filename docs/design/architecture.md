@@ -200,9 +200,10 @@ ChainSeed depends on a small public surface rather than compiler internals.
 | Runtime testing | list containers, inspect labels, enter namespaces, execute probes |
 | Extension metadata | name, version, SeedEmu API version, owned layer names |
 
-Servers store compiler-neutral `SystemProfile` aliases. Each Service supplies
-`DockerImage` declarations through `getDockerImages(platform)`. Native SeedEmu
-Docker collects and validates these mappings before selecting each node's image.
+Servers store compiler-neutral `SystemProfile` aliases. Each Service declares a
+`DOCKER_IMAGES` mapping from platform and profile to `DockerImage`. The shared
+`Service.getDockerImages(platform)` returns these defaults with per-instance
+overrides. Native SeedEmu Docker collects and validates these mappings before selecting each node's image.
 Conflicting profile or image-name definitions fail explicitly. Monero custom
 images use the same profile and Service mapping path.
 

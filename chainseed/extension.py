@@ -37,6 +37,7 @@ def check_seedemu_compatibility() -> None:
 
     required = {
         "seedemu.core.SystemProfile": hasattr(core, "SystemProfile"),
+        "Service.DOCKER_IMAGES": hasattr(core.Service, "DOCKER_IMAGES"),
         "Service.getDockerImages": callable(getattr(core.Service, "getDockerImages", None)),
         "Service.setDockerImage": callable(getattr(core.Service, "setDockerImage", None)),
         "Docker._collectServiceImages": callable(getattr(Docker, "_collectServiceImages", None)),
