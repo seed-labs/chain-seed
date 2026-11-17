@@ -20,18 +20,18 @@ and security experiments.
 ChainSeed depends on SeedEmu. Follow the
 [SeedEmu installation instructions](https://github.com/seed-labs/seed-emulator/blob/development/README.md#getting-started)
 to set up the required environment, including Python 3.10, Docker Engine,
-and Docker Compose. Install SeedEmu 0.0.7 before ChainSeed 1.0.0.
+and Docker Compose. Install SeedEmu 2.0.0 before ChainSeed 1.0.0.
 We recommend running a basic SeedEmu example to verify the environment
 before installing ChainSeed.
 
 To run the examples, clone both repositories into the same workspace, using the
-`development` branch of SeedEmu:
+`release` branch of SeedEmu:
 
 ```bash
 mkdir -p workspace
 cd workspace
 
-git clone --branch development https://github.com/seed-labs/seed-emulator.git
+git clone --branch release https://github.com/seed-labs/seed-emulator.git
 git clone https://github.com/seed-labs/chain-seed.git
 ```
 
@@ -66,9 +66,9 @@ uv pip install ../seed-emulator
 uv pip install .
 ```
 
-After the packages are published, the source installation commands above can be
-replaced with `pip install seedemu==0.0.7` followed by `pip install chainseed==1.0.0`
-(or `uv pip install` with the same package names). The examples remain in this repository.
+SeedEmu 2.0.0 is available on PyPI. For now, install the SeedEmu `release`
+checkout as above to test the extension interfaces required by ChainSeed.
+The examples remain in this repository.
 
 ## Quick start
 

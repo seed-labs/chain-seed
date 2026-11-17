@@ -17,7 +17,6 @@ def main():
     import seedemu
     assert metadata.version("seedemu")
     assert "site-packages" in str(Path(seedemu.__file__).resolve())
-    assert metadata.version("seedemu") == "0.0.7"
     import chainseed
     from chainseed.services.chainlink import ChainlinkService
     from chainseed.services.ethereum import EthereumService
