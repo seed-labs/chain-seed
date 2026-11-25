@@ -3,7 +3,7 @@
 from copy import deepcopy
 from dataclasses import dataclass
 
-from seedemu.containerBundle import ContainerBundle
+from seedemu.containerBundle import ContainerBundle, PreparedContainer
 
 CLICKHOUSE = "clickhouse"
 POSTGRES = "postgres"
@@ -124,6 +124,10 @@ FRONTEND_START_SH = [
     "done",
 ]
 
+DOCKERFILE_LINES = [
+    "ARG DEBIAN_FRONTEND=noninteractive",
+    "RUN apt-get update && apt-get install -y --no-install-recommends iproute2 iputils-ping && rm -rf /var/lib/apt/lists/*",
+]
 
 class EthExplorer(ContainerBundle):
     """!
@@ -152,8 +156,8 @@ class EthExplorer(ContainerBundle):
             ETHEXPLORER_API_SERVER,
             ETHEXPLORER_WEB,
         ]
-        for service_name in service_names:
-            self._createContainer(service_name, suffix)
+        for name in service_names:
+            self._containers.update({name: PreparedContainer(name=name, suffix=suffix, emulator=emulator)})
         self._required_port_count = 1
         self._required_internal_address_count = 2
         self.__beacon_host = self.__geth_host = ""
@@ -340,6 +344,7 @@ class EthExplorer(ContainerBundle):
             for command in backend_start_commands
         ]
         ethexplorer_api_server._start_commands = backend_start_commands
+        ethexplorer_api_server.setDockerfileLines([f"FROM {SEEDEMU_ETH_EXPLORER_BACKEND_IMAGE}", *DOCKERFILE_LINES])
 
         ethexplorer_web = self._containers[ETHEXPLORER_WEB]
         ethexplorer_web.updateServiceConfig(
@@ -396,6 +401,7 @@ class EthExplorer(ContainerBundle):
             for command in frontend_start_commands
         ]
         ethexplorer_web._start_commands = frontend_start_commands
+        ethexplorer_web.setDockerfileLines([f"FROM {SEEDEMU_ETH_EXPLORER_WEB_IMAGE}", *DOCKERFILE_LINES])
 
     def getBeaconHost(self) -> str:
         """!
